@@ -41,14 +41,8 @@
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,int nShowCmd)
 {
     System* system = new System();
-    bool result = system->Initialize();
 
-    if (result)
-    {
-        system->Run();
-
-        system->Shutdown();
-    }
+    int result = system->Run();
 
     delete system;
 
