@@ -2,6 +2,9 @@
 #include "System.h"
 
 
+#include "DX11Renderer.h"
+
+
 System::System()
 {
     mRenderer = NULL;
@@ -18,22 +21,22 @@ int System::Run()
 
     if (result)
     {
-        mRenderer->Render();
+        result = mRenderer->Render();
 
         Shutdown();
     }
 
     if (!result)
-        return EXIT_FAILURE; //This macro means that the application wasn't successful.
+        return EXIT_FAILURE; //Means that the application wasn't successful.
     else
-        return EXIT_SUCCESS; //This macro means that the application was successful.
+        return EXIT_SUCCESS; //Means that the application was successful.
 }
 
 bool System::Initialize()
 {
     bool result = true;
 
-    mRenderer = new Renderer();
+    mRenderer = new DX11Renderer();
     result = mRenderer->Initialize();
 
     return result;

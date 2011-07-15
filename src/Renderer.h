@@ -3,18 +3,15 @@
 #define PE_RENDERER_H
 
 
-#include <windows.h> //Includes lots of other header files useful for Windows programming.
-
-
 class Renderer
 {
 public:
     Renderer();
     virtual ~Renderer();
 
-    bool Initialize();
+    virtual bool Initialize();
 
-    bool Render();
+    virtual bool Render();
 };
 
 
