@@ -4,14 +4,36 @@
 
 DX11Renderer::DX11Renderer()
 {
+    mDevice = NULL;
+    mDeviceContext = NULL;
+    mSwapChain = NULL;
 }
 
 DX11Renderer::~DX11Renderer()
 {
+    if (mSwapChain != NULL)
+    {
+        mSwapChain->Release();
+        mSwapChain = NULL;
+    }
+
+    if (mDeviceContext != NULL)
+    {
+        mDeviceContext->Release();
+        mDeviceContext = NULL;
+    }
+
+    if (mDevice != NULL)
+    {
+        mDevice->Release();
+        mDevice = NULL;
+    }
 }
 
 bool DX11Renderer::Initialize()
 {
+    //@todo: fill with DX11 stuff.
+
     return true;
 }
 
