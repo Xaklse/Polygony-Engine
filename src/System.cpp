@@ -15,13 +15,46 @@ System::~System()
     Shutdown();
 }
 
-int System::Run()
+int System::Run(const std::string& commandLine)
 {
     bool result = Initialize();
 
     if (result)
     {
-        result = mRenderer->Render();
+        MSG message;
+
+        // Initialize the message structure.
+        ZeroMemory(&message,sizeof(MSG));
+
+        // Loop until there is a quit message from the window or the user.
+        bool loop = true;
+
+        while (loop)
+        {
+            // Handle the windows messages.
+            if (PeekMessage(&message,NULL,0,0,PM_REMOVE))
+            {
+                TranslateMessage(&message);
+                DispatchMessage(&message);
+            }
+
+            // If windows signals to end the application then exit out.
+            if (message.message == WM_QUIT)
+            {
+                loop = false;
+            }
+            else
+            {
+                // Otherwise do the frame processing.
+                result = mRenderer->Render();
+
+                if (!result)
+                {
+                    loop = false;
+                }
+            }
+
+        }
 
         Shutdown();
     }
@@ -34,7 +67,7 @@ int System::Run()
 
 bool System::Initialize()
 {
-    bool result = true;
+    bool result;
 
     mRenderer = new DX11Renderer();
     result = mRenderer->Initialize();

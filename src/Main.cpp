@@ -27,23 +27,26 @@
  */
 
 
-#include <System.h>
+#include <windows.h> //Header files useful for Windows programming.
+
+
+#include "System.h"
 
 
 /**
- * The entry point for any Windows program.
- * @param hInstance      integer which identifies this application
- * @param hPrevInstance  obsolete
- * @param lpCmdLine      pointer to a string that contains the command line
- * @param nShowCmd       indicates how the window is to appear when created
- * @return               exit value of the program; 0 means no errors
+ * The entry point for any program based on Windows.
+ * @param hInstance       integer which identifies this application
+ * @param hPrevInstance   obsolete
+ * @param lpCommandLine   long pointer to string that contains the command line
+ * @param nShowCommand    indicates how the window is to appear when created
+ * @return                exit value of the program; 0 means no errors
  */
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,LPSTR lpCmdLine,
-        int nShowCmd)
+int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
+        LPSTR lpCommandLine,int nShowCommand)
 {
     System* system = new System();
 
-    int result = system->Run();
+    int result = system->Run(std::string(lpCommandLine));
 
     delete system;
 

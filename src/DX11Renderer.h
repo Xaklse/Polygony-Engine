@@ -44,4 +44,8 @@ private:
 };
 
 
+static LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+
+
+
 #endif //PE_DX11_RENDERER_H

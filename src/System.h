@@ -3,16 +3,13 @@
 #define PE_SYSTEM_H
 
 
-#define WIN32_LEAN_AND_MEAN //Speeds up the build process, it reduces the size
-                            //of the Win32 header files by excluding some of the
-                            //less used APIs.
-
-
 #include <stdlib.h>  //Includes several general purpose functions for dynamic
                      //memory management, random number generation,
                      //communication with the environment, integer arithmetics,
                      //searching, sorting and converting.
-#include <windows.h> //Includes header files useful for Windows programming.
+#include <string>    //Includes the string class of the Standard Template
+                     //Library (STL).
+#include <windows.h> //Header file useful for Windows programming.
 
 
 #include "Renderer.h"
@@ -24,7 +21,7 @@ public:
     System();
     virtual ~System();
 
-    int Run();
+    int Run(const std::string& commandLine);
 
 private:
     bool Initialize();
