@@ -25,7 +25,7 @@
 class DX11Renderer : public Renderer
 {
 public:
-    DX11Renderer();
+    DX11Renderer(System* system);
     virtual ~DX11Renderer();
 
     virtual bool Initialize();
@@ -33,6 +33,12 @@ public:
     virtual bool Render();
 
 private:
+    /**Handle to the application instance.*/
+    HINSTANCE mInstanceHandle;
+
+    /**Handle to the main window.*/
+    HWND mWindowHandle;
+
     /**A virtual representation of the video adapter.*/
     ID3D11Device* mDevice;
 
@@ -44,8 +50,18 @@ private:
 };
 
 
-static LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,LPARAM lParam);
+static System* sSystem;
+static LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,
+    LPARAM lParam)
+{
+    if (sSystem != NULL && !sSystem->WindowsEvent(hWnd,message,wParam,lParam))
+    {
+        //Send the event to the default message handler.
+        return DefWindowProc(hWnd,message,wParam,lParam);
+    }
 
+    return 0;
+}
 
 
 #endif //PE_DX11_RENDERER_H

@@ -22,6 +22,8 @@ public:
     virtual ~System();
 
     int Run(const std::string& commandLine);
+    bool WindowsEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
+        LPARAM secondParam);
 
 private:
     bool Initialize();

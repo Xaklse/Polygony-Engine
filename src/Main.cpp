@@ -35,14 +35,14 @@
 
 /**
  * The entry point for any program based on Windows.
- * @param hInstance       integer which identifies this application
- * @param hPrevInstance   obsolete
- * @param lpCommandLine   long pointer to string that contains the command line
- * @param nShowCommand    indicates how the window is to appear when created
- * @return                exit value of the program; 0 means no errors
+ * @param hInstance      integer which identifies this application
+ * @param hPrevInstance  obsolete
+ * @param lpCommandLine  long pointer to string that contains the command line
+ * @param nShowCommand   indicates how the window is to appear when created
+ * @return               exit value of the program; 0 means no errors
  */
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
-        LPSTR lpCommandLine,int nShowCommand)
+    LPSTR lpCommandLine,int nShowCommand)
 {
     System* system = new System();
 
