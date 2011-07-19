@@ -7,7 +7,13 @@
 
 System::System()
 {
+    mInstanceHandle = NULL;
     mRenderer = NULL;
+    mWindowHandle = NULL;
+
+    mWindowClass = L"PolygonyEngine";
+
+    sSystem = this;
 }
 
 System::~System()
@@ -17,12 +23,61 @@ System::~System()
 
 bool System::Initialize()
 {
-    bool result;
+    //Default configuration values.
+    bool fullScreen = false;
+    unsigned int fullscreenWidth = 1280,fullscreenHeight = 720;
+    unsigned int windowWidth = 800,windowHeight = 600;
 
-    mRenderer = new DX11Renderer(this);
-    result = mRenderer->Initialize();
+    unsigned int width = fullScreen ? fullscreenWidth : windowWidth;
+    unsigned int height = fullScreen ? fullscreenHeight : windowHeight;
 
-    return result;
+    WNDCLASSEX windowClass;
+
+    //Initialize the window class structure.
+    ZeroMemory(&windowClass,sizeof(WNDCLASSEX));
+
+    //Fill in the structure with the needed information.
+    windowClass.cbSize = sizeof(WNDCLASSEX);
+    windowClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
+    windowClass.hCursor = LoadCursor(NULL,IDC_ARROW);
+    windowClass.hInstance = mInstanceHandle;
+    windowClass.lpfnWndProc = WndProc;
+    windowClass.lpszClassName = mWindowClass;
+    windowClass.style = CS_HREDRAW | CS_VREDRAW;
+
+    //Register the window class.
+    RegisterClassEx(&windowClass);
+
+    //Initialize a rectangle with the size of the desired client area.
+    RECT windowRect = {0,0,width,height};
+
+    //Adjust the size for the final window.
+    AdjustWindowRect(&windowRect,WS_OVERLAPPEDWINDOW,FALSE);
+
+    //Create the window and use the result as the handle.
+    mWindowHandle = CreateWindowEx(NULL,mWindowClass,L"Polygony Engine",
+        WS_OVERLAPPEDWINDOW,(GetSystemMetrics(SM_CXSCREEN) - width) / 2,
+        (GetSystemMetrics(SM_CYSCREEN) - height) / 2,
+        windowRect.right - windowRect.left,windowRect.bottom - windowRect.top,
+        NULL,NULL,mInstanceHandle,NULL);
+
+    if (mWindowHandle != NULL)
+    {
+        //Display the window on the screen.
+        ShowWindow(mWindowHandle,SW_SHOW);
+
+        //Bring the window up on the screen and set it as main focus.
+        SetForegroundWindow(mWindowHandle);
+        SetFocus(mWindowHandle);
+
+        mRenderer = new DX11Renderer(this);
+
+        return mRenderer->Initialize();
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void System::Shutdown()
@@ -32,10 +87,26 @@ void System::Shutdown()
         delete mRenderer;
         mRenderer = NULL;
     }
+
+    if (mWindowHandle != NULL)
+    {
+        DestroyWindow(mWindowHandle);
+        mWindowHandle = NULL;
+    }
+
+    if (mInstanceHandle != NULL)
+    {
+        UnregisterClass(mWindowClass,mInstanceHandle);
+        mInstanceHandle = NULL;
+    }
+
+    sSystem = NULL;
 }
 
-int System::Run(const std::string& commandLine)
+int System::Run(HINSTANCE instanceHandle,const std::string& commandLine)
 {
+    mInstanceHandle = instanceHandle;
+
     bool result = Initialize();
 
     if (result)
@@ -84,7 +155,7 @@ int System::Run(const std::string& commandLine)
         return EXIT_SUCCESS; //Means that the application was successful.
 }
 
-bool System::WindowsEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
+bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
     LPARAM secondParam)
 {
     switch (intMessage)
@@ -119,4 +190,9 @@ bool System::WindowsEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
     }
 
     return true;
+}
+
+HWND System::GetWindowHandle()
+{
+    return mWindowHandle;
 }

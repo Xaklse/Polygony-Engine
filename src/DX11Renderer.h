@@ -3,9 +3,7 @@
 #define PE_DX11_RENDERER_H
 
 
-//Header files useful for Windows programming.
-#include <windows.h>
-#include <windowsx.h>
+#include <windows.h> //Header file useful for Windows programming.
 
 //Header files which contain all the Direct3D functionality for setting up and
 //drawing 3D graphics in DirectX as well as tools to interface with hardware.
@@ -33,35 +31,15 @@ public:
     virtual bool Render();
 
 private:
-    /**Handle to the application instance.*/
-    HINSTANCE mInstanceHandle;
-
-    /**Handle to the main window.*/
-    HWND mWindowHandle;
-
-    /**A virtual representation of the video adapter.*/
+    /*A virtual representation of the video adapter.*/
     ID3D11Device* mDevice;
 
-    /**Used to render graphics and to determine how they will be rendered.*/
+    /*Used to render graphics and to determine how they will be rendered.*/
     ID3D11DeviceContext* mDeviceContext;
 
-    /**Chain of buffers which swap positions each time a frame is rendered.*/
+    /*Chain of buffers which swap positions each time a frame is rendered.*/
     IDXGISwapChain* mSwapChain;
 };
-
-
-static System* sSystem;
-static LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,
-    LPARAM lParam)
-{
-    if (sSystem != NULL && !sSystem->WindowsEvent(hWnd,message,wParam,lParam))
-    {
-        //Send the event to the default message handler.
-        return DefWindowProc(hWnd,message,wParam,lParam);
-    }
-
-    return 0;
-}
 
 
 #endif //PE_DX11_RENDERER_H
