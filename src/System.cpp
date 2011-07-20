@@ -2,6 +2,15 @@
 #include "System.h"
 
 
+#include "Poco/AutoPtr.h"
+#include "Poco/DateTimeFormat.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/FileChannel.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/SplitterChannel.h"
+#include "Poco/WindowsConsoleChannel.h"
+
+
 #include "DX11Renderer.h"
 
 
@@ -23,56 +32,82 @@ System::~System()
 
 bool System::Initialize()
 {
-    //Default configuration values.
-    bool fullScreen = false;
-    unsigned int fullscreenWidth = 1280,fullscreenHeight = 720;
-    unsigned int windowWidth = 800,windowHeight = 600;
-
-    unsigned int width = fullScreen ? fullscreenWidth : windowWidth;
-    unsigned int height = fullScreen ? fullscreenHeight : windowHeight;
-
-    WNDCLASSEX windowClass;
-
-    //Initialize the window class structure.
-    ZeroMemory(&windowClass,sizeof(WNDCLASSEX));
-
-    //Fill in the structure with the needed information.
-    windowClass.cbSize = sizeof(WNDCLASSEX);
-    windowClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
-    windowClass.hCursor = LoadCursor(NULL,IDC_ARROW);
-    windowClass.hInstance = mInstanceHandle;
-    windowClass.lpfnWndProc = WndProc;
-    windowClass.lpszClassName = mWindowClass;
-    windowClass.style = CS_HREDRAW | CS_VREDRAW;
-
-    //Register the window class.
-    RegisterClassEx(&windowClass);
-
-    //Initialize a rectangle with the size of the desired client area.
-    RECT windowRect = {0,0,width,height};
-
-    //Adjust the size for the final window.
-    AdjustWindowRect(&windowRect,WS_OVERLAPPEDWINDOW,FALSE);
-
-    //Create the window and use the result as the handle.
-    mWindowHandle = CreateWindowEx(NULL,mWindowClass,L"Polygony Engine",
-        WS_OVERLAPPEDWINDOW,(GetSystemMetrics(SM_CXSCREEN) - width) / 2,
-        (GetSystemMetrics(SM_CYSCREEN) - height) / 2,
-        windowRect.right - windowRect.left,windowRect.bottom - windowRect.top,
-        NULL,NULL,mInstanceHandle,NULL);
-
-    if (mWindowHandle != NULL)
+    if (AllocConsole() != 0)
     {
-        //Display the window on the screen.
-        ShowWindow(mWindowHandle,SW_SHOW);
+        Poco::AutoPtr<Poco::WindowsConsoleChannel> pConsoleChannel(
+            new Poco::WindowsConsoleChannel());
 
-        //Bring the window up on the screen and set it as main focus.
-        SetForegroundWindow(mWindowHandle);
-        SetFocus(mWindowHandle);
+        Poco::AutoPtr<Poco::FileChannel> pFileChannel(new Poco::FileChannel());
+        pFileChannel->setProperty("path","log.log");
+        pFileChannel->setProperty("rotation","10 M");
 
-        mRenderer = new DX11Renderer(this);
+        Poco::AutoPtr<Poco::SplitterChannel> pSplitterChannel(
+            new Poco::SplitterChannel());
+        pSplitterChannel->addChannel(pConsoleChannel);
+        pSplitterChannel->addChannel(pFileChannel);
 
-        return mRenderer->Initialize();
+        Poco::Logger::root().setChannel(pSplitterChannel);
+
+        Poco::Logger::root().information(Poco::DateTimeFormatter::format(
+            Poco::LocalDateTime(),Poco::DateTimeFormat::HTTP_FORMAT));
+
+        Log("Initializing Polygony Engine...");
+
+        //Default configuration values.
+        bool fullScreen = false;
+        unsigned int fullscreenWidth = 1280,fullscreenHeight = 720;
+        unsigned int windowWidth = 800,windowHeight = 600;
+
+        unsigned int width = fullScreen ? fullscreenWidth : windowWidth;
+        unsigned int height = fullScreen ? fullscreenHeight : windowHeight;
+
+        WNDCLASSEX windowClass;
+
+        //Initialize the window class structure.
+        ZeroMemory(&windowClass,sizeof(WNDCLASSEX));
+
+        //Fill in the structure with the needed information.
+        windowClass.cbSize = sizeof(WNDCLASSEX);
+        windowClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
+        windowClass.hCursor = LoadCursor(NULL,IDC_ARROW);
+        windowClass.hInstance = mInstanceHandle;
+        windowClass.lpfnWndProc = WndProc;
+        windowClass.lpszClassName = mWindowClass;
+        windowClass.style = CS_HREDRAW | CS_VREDRAW;
+
+        //Register the window class.
+        RegisterClassEx(&windowClass);
+
+        //Initialize a rectangle with the size of the desired client area.
+        RECT windowRect = {0,0,width,height};
+
+        //Adjust the size for the final window.
+        AdjustWindowRect(&windowRect,WS_OVERLAPPEDWINDOW,FALSE);
+
+        //Create the window and use the result as the handle.
+        mWindowHandle = CreateWindowEx(NULL,mWindowClass,L"Polygony Engine",
+            WS_OVERLAPPEDWINDOW,(GetSystemMetrics(SM_CXSCREEN) - width) / 2,
+            (GetSystemMetrics(SM_CYSCREEN) - height) / 2,
+            windowRect.right - windowRect.left,windowRect.bottom - windowRect.top,
+            NULL,NULL,mInstanceHandle,NULL);
+
+        if (mWindowHandle != NULL)
+        {
+            //Display the window on the screen.
+            ShowWindow(mWindowHandle,SW_SHOW);
+
+            //Bring the window up on the screen and set it as main focus.
+            SetForegroundWindow(mWindowHandle);
+            SetFocus(mWindowHandle);
+
+            mRenderer = new DX11Renderer(this);
+
+            return mRenderer->Initialize();
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
@@ -100,7 +135,18 @@ void System::Shutdown()
         mInstanceHandle = NULL;
     }
 
+    Poco::Logger::root().information("");
+
     sSystem = NULL;
+}
+
+void System::Log(const std::string& message)
+{
+    std::string hour(Poco::DateTimeFormatter::format(Poco::LocalDateTime(),
+        "[%H:%M:%S:%i] "));
+    hour += message;
+
+    Poco::Logger::root().information(hour);
 }
 
 int System::Run(HINSTANCE instanceHandle,const std::string& commandLine)

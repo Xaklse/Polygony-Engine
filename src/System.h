@@ -3,6 +3,7 @@
 #define PE_SYSTEM_H
 
 
+#include <iostream>
 #include <stdlib.h>  //Includes several general purpose functions for dynamic
                      //memory management, random number generation,
                      //communication with the environment, integer arithmetics,
@@ -15,6 +16,9 @@
 #include <windowsx.h>
 
 
+#include "Poco/Logger.h"
+
+
 #include "Renderer.h"
 
 
@@ -24,6 +28,7 @@ public:
     System();
     virtual ~System();
 
+    void Log(const std::string& message);
     int Run(HINSTANCE instanceHandle,const std::string& commandLine);
 
     bool WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
