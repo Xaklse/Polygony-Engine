@@ -10,6 +10,8 @@
 #include "Poco/SplitterChannel.h"
 #include "Poco/WindowsConsoleChannel.h"
 
+#include "Poco/Util/IniFileConfiguration.h"
+
 
 #include "DX11Renderer.h"
 
@@ -53,13 +55,35 @@ bool System::Initialize()
 
         Log("Initializing Polygony Engine...");
 
-        //Default configuration values.
-        bool fullScreen = false;
-        unsigned int fullscreenWidth = 1280,fullscreenHeight = 720;
-        unsigned int windowWidth = 800,windowHeight = 600;
+        Log("Loading configurable options...");
+
+        Poco::AutoPtr<Poco::Util::IniFileConfiguration> pConfigurationFile(
+            new Poco::Util::IniFileConfiguration("config.ini"));
+
+        bool fullScreen = pConfigurationFile->getBool(
+            "System.Fullscreen",false);
+        unsigned int fullscreenWidth = pConfigurationFile->getInt(
+            "System.FullscreenX",1280);
+        unsigned int fullscreenHeight = pConfigurationFile->getInt(
+            "System.FullscreenY",720);
+        unsigned int windowWidth = pConfigurationFile->getInt(
+            "System.WindowedX",800);
+        unsigned int windowHeight = pConfigurationFile->getInt(
+            "System.WindowedY",600);
 
         unsigned int width = fullScreen ? fullscreenWidth : windowWidth;
         unsigned int height = fullScreen ? fullscreenHeight : windowHeight;
+
+        if (!fullScreen)
+        {
+            Log("Screen Mode: Windowed " + TO_STRING(width) + "x" +
+                TO_STRING(height));
+        }
+        else
+        {
+            Log("Screen Mode: Fullscreen " + TO_STRING(width) + "x" +
+                TO_STRING(height));
+        }
 
         WNDCLASSEX windowClass;
 
@@ -135,18 +159,19 @@ void System::Shutdown()
         mInstanceHandle = NULL;
     }
 
-    Poco::Logger::root().information("");
+    if (sSystem != NULL)
+    {
+        Log("Shutting down Polygony Engine...");
+        Poco::Logger::root().information("");
 
-    sSystem = NULL;
+        sSystem = NULL;
+    }
 }
 
 void System::Log(const std::string& message)
 {
-    std::string hour(Poco::DateTimeFormatter::format(Poco::LocalDateTime(),
-        "[%H:%M:%S:%i] "));
-    hour += message;
-
-    Poco::Logger::root().information(hour);
+    Poco::Logger::root().information(Poco::cat(Poco::DateTimeFormatter::format(
+        Poco::LocalDateTime(),"[%M:%S.%i] "),message));
 }
 
 int System::Run(HINSTANCE instanceHandle,const std::string& commandLine)

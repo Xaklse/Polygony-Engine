@@ -16,7 +16,9 @@
 #include <windowsx.h>
 
 
+#include "boost/lexical_cast.hpp"
 #include "Poco/Logger.h"
+#include "Poco/String.h"
 
 
 #include "Renderer.h"
@@ -41,6 +43,7 @@ private:
     void Shutdown();
 
     Renderer* mRenderer;
+    System* mSystem;
 
     /*Handle to the application instance.*/
     HINSTANCE mInstanceHandle;

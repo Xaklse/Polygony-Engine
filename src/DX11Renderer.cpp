@@ -11,6 +11,8 @@ DX11Renderer::DX11Renderer(System* system) : Renderer(system)
 
 DX11Renderer::~DX11Renderer()
 {
+    LOG("Shutting down DirectX 11 renderer...");
+
     if (mSwapChain != NULL)
     {
         mSwapChain->Release();
@@ -32,6 +34,8 @@ DX11Renderer::~DX11Renderer()
 
 bool DX11Renderer::Initialize()
 {
+    LOG("Initializing DirectX 11 renderer...");
+
     DXGI_SWAP_CHAIN_DESC swapChainDescriptor;
 
     //Initialize the window class structure.
