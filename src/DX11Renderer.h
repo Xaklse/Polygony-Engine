@@ -1,6 +1,6 @@
 
-#ifndef PE_DX11_RENDERER_H
-#define PE_DX11_RENDERER_H
+#ifndef POLY_DX11_RENDERER_H
+#define POLY_DX11_RENDERER_H
 
 
 #include <windows.h> //Header file useful for Windows programming.
@@ -32,14 +32,14 @@ public:
 
 private:
     /*A virtual representation of the video adapter.*/
-    ID3D11Device* mDevice;
+    ID3D11Device* mpDevice;
 
     /*Used to render graphics and to determine how they will be rendered.*/
-    ID3D11DeviceContext* mDeviceContext;
+    ID3D11DeviceContext* mpDeviceContext;
 
     /*Chain of buffers which swap positions each time a frame is rendered.*/
-    IDXGISwapChain* mSwapChain;
+    IDXGISwapChain* mpSwapChain;
 };
 
 
-#endif //PE_DX11_RENDERER_H
+#endif //POLY_DX11_RENDERER_H

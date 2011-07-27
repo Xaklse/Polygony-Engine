@@ -14,17 +14,18 @@
 
 
 #include "DX11Renderer.h"
+#include "PolyException.h"
 
 
 System::System()
 {
     mInstanceHandle = NULL;
-    mRenderer = NULL;
+    mpRenderer = NULL;
     mWindowHandle = NULL;
 
     mWindowClass = L"PolygonyEngine";
 
-    sSystem = this;
+    spSystem = this;
 }
 
 System::~System()
@@ -34,8 +35,12 @@ System::~System()
 
 bool System::Initialize()
 {
-    if (AllocConsole() != 0)
+    try
     {
+        mStopWatch.start();
+
+        bool result = AllocConsole() != 0;
+
         Poco::AutoPtr<Poco::WindowsConsoleChannel> pConsoleChannel(
             new Poco::WindowsConsoleChannel());
 
@@ -54,6 +59,11 @@ bool System::Initialize()
             Poco::LocalDateTime(),Poco::DateTimeFormat::HTTP_FORMAT));
 
         Log("Initializing Polygony Engine...");
+
+        if (!result)
+        {
+            throw PolyException("Console allocation failed.",GetLastError());
+        }
 
         Log("Loading configurable options...");
 
@@ -112,39 +122,51 @@ bool System::Initialize()
         mWindowHandle = CreateWindowEx(NULL,mWindowClass,L"Polygony Engine",
             WS_OVERLAPPEDWINDOW,(GetSystemMetrics(SM_CXSCREEN) - width) / 2,
             (GetSystemMetrics(SM_CYSCREEN) - height) / 2,
-            windowRect.right - windowRect.left,windowRect.bottom - windowRect.top,
+            windowRect.right - windowRect.left,
+            windowRect.bottom - windowRect.top,
             NULL,NULL,mInstanceHandle,NULL);
 
-        if (mWindowHandle != NULL)
+        if (mWindowHandle == NULL)
         {
-            //Display the window on the screen.
-            ShowWindow(mWindowHandle,SW_SHOW);
-
-            //Bring the window up on the screen and set it as main focus.
-            SetForegroundWindow(mWindowHandle);
-            SetFocus(mWindowHandle);
-
-            mRenderer = new DX11Renderer(this);
-
-            return mRenderer->Initialize();
+            throw PolyException("Window creation failed.",GetLastError());
         }
-        else
-        {
-            return false;
-        }
+
+        //Display the window on the screen.
+        ShowWindow(mWindowHandle,SW_SHOW);
+
+        //Bring the window up on the screen and set it as main focus.
+        SetForegroundWindow(mWindowHandle);
+        SetFocus(mWindowHandle);
+
+        mpRenderer = new DX11Renderer(this);
+
+        result = mpRenderer->Initialize();
+
+        Log("Initialization took " + TO_STRING(
+            static_cast<float>(mStopWatch.elapsed()) /
+            static_cast<float>(mStopWatch.resolution())) + " seconds.");
+
+        return result;
     }
-    else
+    catch (Poco::Exception& exception)
     {
-        return false;
+        Log(exception.message() + " Error code: " +
+            TO_STRING(exception.code()));
     }
+    catch (std::exception& exception)
+    {
+        Log("Error: " + TO_STRING(exception.what()));
+    }
+
+    return false;
 }
 
 void System::Shutdown()
 {
-    if (mRenderer != NULL)
+    if (mpRenderer != NULL)
     {
-        delete mRenderer;
-        mRenderer = NULL;
+        delete mpRenderer;
+        mpRenderer = NULL;
     }
 
     if (mWindowHandle != NULL)
@@ -159,12 +181,14 @@ void System::Shutdown()
         mInstanceHandle = NULL;
     }
 
-    if (sSystem != NULL)
+    if (spSystem != NULL)
     {
         Log("Shutting down Polygony Engine...");
         Poco::Logger::root().information("");
 
-        sSystem = NULL;
+        mStopWatch.stop();
+
+        spSystem = NULL;
     }
 }
 
@@ -207,7 +231,7 @@ int System::Run(HINSTANCE instanceHandle,const std::string& commandLine)
             else
             {
                 //Otherwise do the frame processing.
-                result = mRenderer->Render();
+                result = mpRenderer->Render();
 
                 if (!result)
                 {
@@ -221,9 +245,13 @@ int System::Run(HINSTANCE instanceHandle,const std::string& commandLine)
     }
 
     if (!result)
+    {
         return EXIT_FAILURE; //Means that the application wasn't successful.
+    }
     else
+    {
         return EXIT_SUCCESS; //Means that the application was successful.
+    }
 }
 
 bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,

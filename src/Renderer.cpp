@@ -2,9 +2,9 @@
 #include "Renderer.h"
 
 
-Renderer::Renderer(System* system)
+Renderer::Renderer(System* pSystem)
 {
-    mSystem = system;
+    mpSystem = pSystem;
 }
 
 Renderer::~Renderer()

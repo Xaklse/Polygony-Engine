@@ -44,11 +44,11 @@
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
     LPSTR lpCommandLine,int nShowCommand)
 {
-    System* system = new System();
+    System* pSystem = new System();
 
-    int result = system->Run(hInstance,std::string(lpCommandLine));
+    int result = pSystem->Run(hInstance,std::string(lpCommandLine));
 
-    delete system;
+    delete pSystem;
 
     return result;
 }
