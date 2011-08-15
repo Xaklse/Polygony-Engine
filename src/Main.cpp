@@ -44,6 +44,8 @@
 int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
     LPSTR lpCommandLine,int nShowCommand)
 {
+    using namespace Poly;
+
     System* pSystem = new System();
 
     int result = pSystem->Run(hInstance,std::string(lpCommandLine));

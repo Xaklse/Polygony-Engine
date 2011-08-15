@@ -26,6 +26,11 @@
 
 #include "Globals.h"
 #include "Renderer.h"
+#include "Input.h"
+
+
+namespace Poly
+{
 
 
 class System
@@ -34,6 +39,7 @@ public:
     System();
     virtual ~System();
 
+    void Exit();
     void Log(const std::string& message);
     int Run(HINSTANCE instanceHandle,const std::string& commandLine);
 
@@ -46,6 +52,7 @@ private:
     bool Initialize();
     void Shutdown();
 
+    Input* mpInput;
     Renderer* mpRenderer;
     System* mpSystem;
 
@@ -62,7 +69,10 @@ private:
 };
 
 
-static System* spSystem;
+}
+
+
+static Poly::System* spSystem;
 static LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,
     LPARAM lParam)
 {

@@ -2,6 +2,10 @@
 #include "Renderer.h"
 
 
+namespace Poly
+{
+
+
 Renderer::Renderer(System* pSystem)
 {
     mpSystem = pSystem;
@@ -19,4 +23,7 @@ bool Renderer::Initialize()
 bool Renderer::Render()
 {
     return true;
+}
+
+
 }

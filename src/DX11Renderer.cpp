@@ -2,6 +2,13 @@
 #include "DX11Renderer.h"
 
 
+#include "Exception.h"
+
+
+namespace Poly
+{
+
+
 DX11Renderer::DX11Renderer(System* pSystem) : Renderer(pSystem)
 {
     mpDevice = NULL;
@@ -50,19 +57,22 @@ bool DX11Renderer::Initialize()
     swapChainDescriptor.Windowed = TRUE;
 
     //Create a device, device context and swap chain.
-    if (D3D11CreateDeviceAndSwapChain(NULL,D3D_DRIVER_TYPE_HARDWARE,NULL,NULL,
-        NULL,NULL,D3D11_SDK_VERSION,&swapChainDescriptor,&mpSwapChain,&mpDevice,
-        NULL,&mpDeviceContext) == S_OK)
+    HRESULT result = D3D11CreateDeviceAndSwapChain(NULL,
+        D3D_DRIVER_TYPE_HARDWARE,NULL,NULL,NULL,NULL,D3D11_SDK_VERSION,
+        &swapChainDescriptor,&mpSwapChain,&mpDevice,NULL,&mpDeviceContext);
+
+    if (result != S_OK)
     {
-        return true;
+        throw Exception("Direct3D 11 initialization failed.",result);
     }
-    else
-    {
-        return false;
-    }
+
+    return true;
 }
 
 bool DX11Renderer::Render()
 {
     return true;
+}
+
+
 }

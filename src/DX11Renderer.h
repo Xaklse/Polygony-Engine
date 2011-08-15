@@ -20,6 +20,10 @@
 #include "Renderer.h"
 
 
+namespace Poly
+{
+
+
 class DX11Renderer : public Renderer
 {
 public:
@@ -40,6 +44,9 @@ private:
     /*Chain of buffers which swap positions each time a frame is rendered.*/
     IDXGISwapChain* mpSwapChain;
 };
+
+
+}
 
 
 #endif //POLY_DX11_RENDERER_H

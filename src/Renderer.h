@@ -6,6 +6,10 @@
 #include "Globals.h"
 
 
+namespace Poly
+{
+
+
 class System;
 
 
@@ -22,6 +26,9 @@ public:
 protected:
     System* mpSystem;
 };
+
+
+}
 
 
 #include "System.h"

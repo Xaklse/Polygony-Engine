@@ -14,12 +14,17 @@
 
 
 #include "DX11Renderer.h"
-#include "PolyException.h"
+#include "Exception.h"
+
+
+namespace Poly
+{
 
 
 System::System()
 {
     mInstanceHandle = NULL;
+    mpInput = NULL;
     mpRenderer = NULL;
     mWindowHandle = NULL;
 
@@ -31,6 +36,11 @@ System::System()
 System::~System()
 {
     Shutdown();
+}
+
+void System::Exit()
+{
+    DestroyWindow(mWindowHandle);
 }
 
 bool System::Initialize()
@@ -62,7 +72,7 @@ bool System::Initialize()
 
         if (!result)
         {
-            throw PolyException("Console allocation failed.",GetLastError());
+            throw Exception("Console allocation failed.",GetLastError());
         }
 
         Log("Loading configurable options...");
@@ -128,7 +138,7 @@ bool System::Initialize()
 
         if (mWindowHandle == NULL)
         {
-            throw PolyException("Window creation failed.",GetLastError());
+            throw Exception("Window creation failed.",GetLastError());
         }
 
         //Display the window on the screen.
@@ -138,6 +148,7 @@ bool System::Initialize()
         SetForegroundWindow(mWindowHandle);
         SetFocus(mWindowHandle);
 
+        mpInput = new Input(this);
         mpRenderer = new DX11Renderer(this);
 
         result = mpRenderer->Initialize();
@@ -163,6 +174,12 @@ bool System::Initialize()
 
 void System::Shutdown()
 {
+    if (mpInput != NULL)
+    {
+        delete mpInput;
+        mpInput = NULL;
+    }
+
     if (mpRenderer != NULL)
     {
         delete mpRenderer;
@@ -273,15 +290,13 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
 
         //Check if a key has been pressed on the keyboard.
         case WM_KEYDOWN:
-            //If a key is pressed send it to the input object so it can record that state.
-//            m_Input->KeyDown((unsigned int)wparam);
-            break;
+            if (mpInput->KeyPressEvent(static_cast<unsigned int>(firstParam)))
+                break;
 
         //Check if a key has been released on the keyboard.
         case WM_KEYUP:
-            //If a key is released then send it to the input object so it can unset the state for that key.
-//            m_Input->KeyUp((unsigned int)wparam);
-            break;
+            if (mpInput->KeyReleaseEvent(static_cast<unsigned int>(firstParam)))
+                break;
 
         //Any other messages send to the default message handler as our application won't make use of them.
         default:
@@ -294,4 +309,7 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
 HWND System::GetWindowHandle()
 {
     return mWindowHandle;
+}
+
+
 }
