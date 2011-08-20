@@ -30,7 +30,8 @@ public:
     DX11Renderer(System* system);
     virtual ~DX11Renderer();
 
-    virtual bool Initialize();
+    virtual bool Initialize(bool fullScreen,unsigned int width,
+        unsigned int height);
 
     virtual bool Render();
 
@@ -40,6 +41,9 @@ private:
 
     /*Used to render graphics and to determine how they will be rendered.*/
     ID3D11DeviceContext* mpDeviceContext;
+
+    /*The render target view which will store the back buffer pointer.*/
+    ID3D11RenderTargetView* mpRenderTarget;
 
     /*Chain of buffers which swap positions each time a frame is rendered.*/
     IDXGISwapChain* mpSwapChain;

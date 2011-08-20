@@ -78,7 +78,7 @@ bool System::Initialize()
         Log("Loading configurable options...");
 
         Poco::AutoPtr<Poco::Util::IniFileConfiguration> pConfigurationFile(
-            new Poco::Util::IniFileConfiguration("config.ini"));
+            new Poco::Util::IniFileConfiguration(INI_FILE));
 
         bool fullScreen = pConfigurationFile->getBool(
             "System.Fullscreen",false);
@@ -112,7 +112,6 @@ bool System::Initialize()
 
         //Fill in the structure with the needed information.
         windowClass.cbSize = sizeof(WNDCLASSEX);
-        windowClass.hbrBackground = (HBRUSH)COLOR_WINDOW;
         windowClass.hCursor = LoadCursor(NULL,IDC_ARROW);
         windowClass.hInstance = mInstanceHandle;
         windowClass.lpfnWndProc = WndProc;
@@ -151,7 +150,7 @@ bool System::Initialize()
         mpInput = new Input(this);
         mpRenderer = new DX11Renderer(this);
 
-        result = mpRenderer->Initialize();
+        result = mpRenderer->Initialize(fullScreen,width,height);
 
         Log("Initialization took " + TO_STRING(
             static_cast<float>(mStopWatch.elapsed()) /
@@ -159,7 +158,7 @@ bool System::Initialize()
 
         return result;
     }
-    catch (Poco::Exception& exception)
+    catch (Exception& exception)
     {
         Log(exception.message() + " Error code: " +
             TO_STRING(exception.code()));
@@ -276,34 +275,38 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
 {
     switch (intMessage)
     {
-        //Check if the window is being destroyed.
+        //Check if the window is being closed or destroyed.
+        case WM_CLOSE:
         case WM_DESTROY:
             PostQuitMessage(0);
 
-            break;
-
-        //Check if the window is being closed.
-        case WM_CLOSE:
-            PostQuitMessage(0);
-
-            break;
+            return true;
 
         //Check if a key has been pressed on the keyboard.
         case WM_KEYDOWN:
-            if (mpInput->KeyPressEvent(static_cast<unsigned int>(firstParam)))
-                break;
+            if (mpInput != NULL)
+            {
+                return mpInput->KeyPressEvent(
+                    static_cast<unsigned int>(firstParam));
+            }
 
         //Check if a key has been released on the keyboard.
         case WM_KEYUP:
-            if (mpInput->KeyReleaseEvent(static_cast<unsigned int>(firstParam)))
-                break;
+            if (mpInput != NULL)
+            {
+                return mpInput->KeyReleaseEvent(
+                    static_cast<unsigned int>(firstParam));
+            }
 
-        //Any other messages send to the default message handler as our application won't make use of them.
-        default:
-            return false;
+        //Check if the window size has changed.
+        case WM_SIZE:
+            if (mpRenderer != NULL)
+            {
+                return mpRenderer->WindowResize();
+            }
     }
 
-    return true;
+    return false;
 }
 
 HWND System::GetWindowHandle()

@@ -6,6 +6,7 @@
 #define PI 3.14159265358979323846f
 
 
+#define INI_FILE "config.ini"
 #define LOG mpSystem->Log
 #define TO_STRING boost::lexical_cast<std::string>
 
