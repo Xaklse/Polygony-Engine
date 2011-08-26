@@ -16,7 +16,7 @@ Renderer::~Renderer()
 }
 
 bool Renderer::Initialize(bool fullScreen,unsigned int width,
-    unsigned int height)
+    unsigned int height,bool verticalSync)
 {
     return true;
 }

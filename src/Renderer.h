@@ -20,7 +20,7 @@ public:
     virtual ~Renderer();
 
     virtual bool Initialize(bool fullScreen,unsigned int width,
-        unsigned int height);
+        unsigned int height,bool verticalSync);
 
     virtual bool Render();
     virtual bool WindowResize();

@@ -150,7 +150,8 @@ bool System::Initialize()
         mpInput = new Input(this);
         mpRenderer = new DX11Renderer(this);
 
-        result = mpRenderer->Initialize(fullScreen,width,height);
+        result = mpRenderer->Initialize(fullScreen,width,height,
+            pConfigurationFile->getBool("System.VerticalSync",false));
 
         Log("Initialization took " + TO_STRING(
             static_cast<float>(mStopWatch.elapsed()) /
