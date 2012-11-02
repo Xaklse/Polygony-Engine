@@ -30,14 +30,25 @@ public:
     DX11Renderer(System* system);
     virtual ~DX11Renderer();
 
-    virtual bool Initialize(bool fullScreen,unsigned int width,
-        unsigned int height,bool verticalSync);
+    virtual bool Initialize(uint width,uint height,bool fullScreen,
+        bool verticalSync);
 
     virtual bool Render();
 
 private:
+    struct Vertex
+    {
+        D3DXVECTOR3 Position;
+        D3DXCOLOR Color;
+    };
+
+    bool mVerticalSync;
+
+    /*The render target view which will store the back buffer pointer.*/
+    ID3D11RenderTargetView* mpBackBufferRenderTarget;
+
     /*The depth buffer stored in a 2D texture.*/
-    ID3D11Texture2D* mpDepthBuffer;
+    ID3D11Texture2D* mpDepthBufferTexture;
 
     /*The depth-stencil state interface.*/
     ID3D11DepthStencilState* mpDepthStencilState;
@@ -51,19 +62,20 @@ private:
     /*Used to render graphics and to determine how they will be rendered.*/
     ID3D11DeviceContext* mpDeviceContext;
 
-    /*The rasterizer state.*/
+    /*The rasterizer state interface.*/
     ID3D11RasterizerState* mpRasterizerState;
-
-    /*The render target view which will store the back buffer pointer.*/
-    ID3D11RenderTargetView* mpRenderTarget;
 
     /*Chain of buffers which swap positions each time a frame is rendered.*/
     IDXGISwapChain* mpSwapChain;
 
-    bool mVerticalSync;
     D3DXMATRIX mOrthoMatrix;
     D3DXMATRIX mProjectionMatrix;
     D3DXMATRIX mWorldMatrix;
+
+    ID3D11InputLayout* mpInputLayout;
+    ID3D11PixelShader* mpPixelShader;
+    ID3D11Buffer* mpVertexBuffer;
+    ID3D11VertexShader* mpVertexShader;
 };
 
 

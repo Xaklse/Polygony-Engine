@@ -19,8 +19,8 @@ public:
     Renderer(System* pSystem);
     virtual ~Renderer();
 
-    virtual bool Initialize(bool fullScreen,unsigned int width,
-        unsigned int height,bool verticalSync);
+    virtual bool Initialize(uint width,uint height,bool fullScreen,
+        bool verticalSync);
 
     virtual bool Render();
     virtual bool WindowResize();

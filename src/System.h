@@ -40,8 +40,8 @@ public:
     virtual ~System();
 
     void Exit();
-    void Log(const std::string& message);
-    int Run(HINSTANCE instanceHandle,const std::string& commandLine);
+    void Log(const string& message);
+    int Run(HINSTANCE instanceHandle,const string& commandLine);
 
     bool WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
         LPARAM secondParam);

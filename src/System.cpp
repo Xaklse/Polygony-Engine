@@ -80,19 +80,17 @@ bool System::Initialize()
         Poco::AutoPtr<Poco::Util::IniFileConfiguration> pConfigurationFile(
             new Poco::Util::IniFileConfiguration(INI_FILE));
 
-        bool fullScreen = pConfigurationFile->getBool(
-            "System.Fullscreen",false);
-        unsigned int fullscreenWidth = pConfigurationFile->getInt(
-            "System.FullscreenX",1280);
-        unsigned int fullscreenHeight = pConfigurationFile->getInt(
-            "System.FullscreenY",720);
-        unsigned int windowWidth = pConfigurationFile->getInt(
-            "System.WindowedX",800);
-        unsigned int windowHeight = pConfigurationFile->getInt(
-            "System.WindowedY",600);
+        bool fullScreen = pConfigurationFile->getBool("System.Fullscreen",
+            false);
+        uint fullscreenWidth = pConfigurationFile->getInt("System.FullscreenX",
+            1280);
+        uint fullscreenHeight = pConfigurationFile->getInt("System.FullscreenY",
+            720);
+        uint windowWidth = pConfigurationFile->getInt("System.WindowedX",800);
+        uint windowHeight = pConfigurationFile->getInt("System.WindowedY",600);
 
-        unsigned int width = fullScreen ? fullscreenWidth : windowWidth;
-        unsigned int height = fullScreen ? fullscreenHeight : windowHeight;
+        uint width = fullScreen ? fullscreenWidth : windowWidth;
+        uint height = fullScreen ? fullscreenHeight : windowHeight;
 
         if (!fullScreen)
         {
@@ -150,7 +148,7 @@ bool System::Initialize()
         mpInput = new Input(this);
         mpRenderer = new DX11Renderer(this);
 
-        result = mpRenderer->Initialize(fullScreen,width,height,
+        result = mpRenderer->Initialize(width,height,fullScreen,
             pConfigurationFile->getBool("System.VerticalSync",false));
 
         Log("Initialization took " + TO_STRING(
@@ -209,13 +207,13 @@ void System::Shutdown()
     }
 }
 
-void System::Log(const std::string& message)
+void System::Log(const string& message)
 {
     Poco::Logger::root().information(Poco::cat(Poco::DateTimeFormatter::format(
         Poco::LocalDateTime(),"[%M:%S.%i] "),message));
 }
 
-int System::Run(HINSTANCE instanceHandle,const std::string& commandLine)
+int System::Run(HINSTANCE instanceHandle,const string& commandLine)
 {
     mInstanceHandle = instanceHandle;
 
@@ -288,7 +286,7 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
             if (mpInput != NULL)
             {
                 return mpInput->KeyPressEvent(
-                    static_cast<unsigned int>(firstParam));
+                    static_cast<uint>(firstParam));
             }
 
         //Check if a key has been released on the keyboard.
@@ -296,7 +294,7 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
             if (mpInput != NULL)
             {
                 return mpInput->KeyReleaseEvent(
-                    static_cast<unsigned int>(firstParam));
+                    static_cast<uint>(firstParam));
             }
 
         //Check if the window size has changed.

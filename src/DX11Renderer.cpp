@@ -14,19 +14,48 @@ namespace Poly
 
 DX11Renderer::DX11Renderer(System* pSystem) : Renderer(pSystem)
 {
-    mpDepthBuffer = NULL;
+    mpBackBufferRenderTarget = NULL;
+    mpDepthBufferTexture = NULL;
     mpDepthStencilState = NULL;
     mpDepthStencilView = NULL;
     mpDevice = NULL;
     mpDeviceContext = NULL;
     mpRasterizerState = NULL;
-    mpRenderTarget = NULL;
     mpSwapChain = NULL;
+
+    mpInputLayout = NULL;
+    mpPixelShader = NULL;
+    mpVertexBuffer = NULL;
+    mpVertexShader = NULL;
 }
 
 DX11Renderer::~DX11Renderer()
 {
     LOG("Shutting down DirectX 11 renderer...");
+
+    if (mpInputLayout != NULL)
+    {
+        mpInputLayout->Release();
+        mpInputLayout = NULL;
+    }
+
+    if (mpPixelShader != NULL)
+    {
+        mpPixelShader->Release();
+        mpPixelShader = NULL;
+    }
+
+    if (mpVertexShader != NULL)
+    {
+        mpVertexShader->Release();
+        mpVertexShader = NULL;
+    }
+
+    if (mpVertexBuffer != NULL)
+    {
+        mpVertexBuffer->Release();
+        mpVertexBuffer = NULL;
+    }
 
     if (mpSwapChain != NULL)
     {
@@ -55,16 +84,16 @@ DX11Renderer::~DX11Renderer()
         mpDepthStencilState = NULL;
     }
 
-    if (mpDepthBuffer != NULL)
+    if (mpDepthBufferTexture != NULL)
     {
-        mpDepthBuffer->Release();
-        mpDepthBuffer = NULL;
+        mpDepthBufferTexture->Release();
+        mpDepthBufferTexture = NULL;
     }
 
-    if (mpRenderTarget != NULL)
+    if (mpBackBufferRenderTarget != NULL)
     {
-        mpRenderTarget->Release();
-        mpRenderTarget = NULL;
+        mpBackBufferRenderTarget->Release();
+        mpBackBufferRenderTarget = NULL;
     }
 
     if (mpDeviceContext != NULL)
@@ -80,8 +109,8 @@ DX11Renderer::~DX11Renderer()
     }
 }
 
-bool DX11Renderer::Initialize(bool fullScreen,unsigned int width,
-    unsigned int height,bool verticalSync)
+bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
+    bool verticalSync)
 {
     LOG("Initializing DirectX 11 renderer...");
 
@@ -187,7 +216,8 @@ bool DX11Renderer::Initialize(bool fullScreen,unsigned int width,
     }
 
     //Create the render target view with the back buffer pointer.
-    result = mpDevice->CreateRenderTargetView(pTexture,NULL,&mpRenderTarget);
+    result = mpDevice->CreateRenderTargetView(pTexture,NULL,
+        &mpBackBufferRenderTarget);
 
     if (result != S_OK)
     {
@@ -219,7 +249,8 @@ bool DX11Renderer::Initialize(bool fullScreen,unsigned int width,
     textureDescriptor.Usage = D3D11_USAGE_DEFAULT;
 
     //Create the texture for the depth buffer.
-    result = mpDevice->CreateTexture2D(&textureDescriptor,NULL,&mpDepthBuffer);
+    result = mpDevice->CreateTexture2D(&textureDescriptor,NULL,
+        &mpDepthBufferTexture);
 
     if (result != S_OK)
     {
@@ -277,7 +308,7 @@ bool DX11Renderer::Initialize(bool fullScreen,unsigned int width,
     depthStencilViewDescriptor.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
     //Create the depth-stencil view interface.
-    result = mpDevice->CreateDepthStencilView(mpDepthBuffer,
+    result = mpDevice->CreateDepthStencilView(mpDepthBufferTexture,
         &depthStencilViewDescriptor,&mpDepthStencilView);
 
     if (result != S_OK)
@@ -288,7 +319,8 @@ bool DX11Renderer::Initialize(bool fullScreen,unsigned int width,
 
     //Bind the render target view and depth-stencil view interface to the output
     //render pipeline.
-    mpDeviceContext->OMSetRenderTargets(1,&mpRenderTarget,mpDepthStencilView);
+    mpDeviceContext->OMSetRenderTargets(1,&mpBackBufferRenderTarget,
+        mpDepthStencilView);
 
 
 
@@ -342,16 +374,150 @@ bool DX11Renderer::Initialize(bool fullScreen,unsigned int width,
 
 
 
-    //Create the projection matrix for 3D rendering.
+    //Create the projection matrix for 3D rendering; uses a left-handed
+    //coordinate system.
     D3DXMatrixPerspectiveFovLH(&mProjectionMatrix,PI * 0.25f,
         static_cast<float>(width) / static_cast<float>(height),0.1f,1000.0f);
 
     //Initialize the world matrix to the identity matrix.
     D3DXMatrixIdentity(&mWorldMatrix);
 
-    //Create an orthographic projection matrix for 2D rendering.
+    //Create an orthographic projection matrix for 2D rendering; uses a
+    //left-handed coordinate system.
     D3DXMatrixOrthoLH(&mOrthoMatrix,static_cast<float>(width),
         static_cast<float>(height),0.1f,1000.0f);
+
+
+
+    //Create a triangle using the vertex structure.
+    Vertex vertices[] =
+    {
+        {D3DXVECTOR3(0.0f,0.5f,0.0f),D3DXCOLOR(1.0f,0.0f,0.0f,1.0f)},
+        {D3DXVECTOR3(0.45f,-0.5,0.0f),D3DXCOLOR(0.0f,1.0f,0.0f,1.0f)},
+        {D3DXVECTOR3(-0.45f,-0.5f,0.0f),D3DXCOLOR(0.0f,0.0f,1.0f,1.0f)}
+    };
+
+
+
+    D3D11_BUFFER_DESC bufferDescriptor;
+
+    //Initialize the vertex buffer structure.
+    ZeroMemory(&bufferDescriptor,sizeof(D3D11_BUFFER_DESC));
+
+    //Fill in the structure with the needed information.
+    bufferDescriptor.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    bufferDescriptor.ByteWidth = sizeof(Vertex) * 3;
+    bufferDescriptor.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    bufferDescriptor.Usage = D3D11_USAGE_DYNAMIC;
+
+    //Create the vertex buffer.
+    result = mpDevice->CreateBuffer(&bufferDescriptor,NULL,&mpVertexBuffer);
+
+    if (result != S_OK)
+    {
+        throw Exception("Direct3D 11 init failed (CreateVertexBuffer).",
+            result);
+    }
+
+
+
+    //Provides access to subresource data.
+    D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+
+    //Map the buffer (obtain buffer's location and block it).
+    result = mpDeviceContext->Map(mpVertexBuffer,NULL,D3D11_MAP_WRITE_DISCARD,
+        NULL,&mappedSubresource);
+
+    if (result != S_OK)
+    {
+        throw Exception("Direct3D 11 init failed (MapVertexBuffer).",
+            result);
+    }
+
+    //Copy the vertices into the vertex buffer.
+    memcpy(mappedSubresource.pData,vertices,sizeof(vertices));
+
+    //Unmap the buffer (unblock it).
+    mpDeviceContext->Unmap(mpVertexBuffer,NULL);
+
+
+
+    //Interfaces used to return arbitrary length data.
+    ID3D10Blob* pVertexShaderBlob;
+    ID3D10Blob* pPixelShaderBlob;
+
+    //Load and compile the vertex shader.
+    result = D3DX11CompileFromFile(L"shaders.hlsl",NULL,NULL,"VShader","vs_5_0",
+        0,0,NULL,&pVertexShaderBlob,NULL,NULL);
+
+    if (result != S_OK)
+    {
+        throw Exception("Direct3D 11 init failed (CompileVertexShader).",
+            result);
+    }
+
+    //Load and compile the pixel shader.
+    result = D3DX11CompileFromFile(L"shaders.hlsl",NULL,NULL,"PShader","ps_5_0",
+        0,0,NULL,&pPixelShaderBlob,NULL,NULL);
+
+    if (result != S_OK)
+    {
+        throw Exception("Direct3D 11 init failed (CompilePixelShader).",
+            result);
+    }
+
+    //Encapsulate the vertex shader into a shader object.
+    result = mpDevice->CreateVertexShader(pVertexShaderBlob->GetBufferPointer(),
+        pVertexShaderBlob->GetBufferSize(),NULL,&mpVertexShader);
+
+    if (result != S_OK)
+    {
+        throw Exception("Direct3D 11 init failed (CreateVertexShader).",
+            result);
+    }
+
+    //Encapsulate the pixel shader into a shader object.
+    result = mpDevice->CreatePixelShader(pPixelShaderBlob->GetBufferPointer(),
+        pPixelShaderBlob->GetBufferSize(),NULL,&mpPixelShader);
+
+    if (result != S_OK)
+    {
+        throw Exception("Direct3D 11 init failed (CreatePixelShader).",
+            result);
+    }
+
+    //Set the vertex shader object as active and ready for the device.
+    mpDeviceContext->VSSetShader(mpVertexShader,NULL,0);
+
+    //Set the pixel shader object as active and ready for the device.
+    mpDeviceContext->PSSetShader(mpPixelShader,NULL,0);
+
+
+
+    //Initialize the descriptor of the input-layout object.
+    D3D11_INPUT_ELEMENT_DESC inputElementDescriptor[] =
+    {
+        {"POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,
+         D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
+        {"COLOR",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,
+         D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0},
+    };
+
+    //Create the input-layout object.
+    result = mpDevice->CreateInputLayout(inputElementDescriptor,2,
+        pVertexShaderBlob->GetBufferPointer(),
+        pVertexShaderBlob->GetBufferSize(),&mpInputLayout);
+
+    if (result != S_OK)
+    {
+        throw Exception("Direct3D 11 init failed (CreateInputLayout).",
+            result);
+    }
+
+    //Bind the input-layout object to the input-assembler stage.
+    mpDeviceContext->IASetInputLayout(mpInputLayout);
+
+
 
     return true;
 }
@@ -359,12 +525,29 @@ bool DX11Renderer::Initialize(bool fullScreen,unsigned int width,
 bool DX11Renderer::Render()
 {
     //Clear the back buffer to a plain color.
-    mpDeviceContext->ClearRenderTargetView(mpRenderTarget,
+    mpDeviceContext->ClearRenderTargetView(mpBackBufferRenderTarget,
         D3DXCOLOR(0.0f,0.2f,0.4f,1.0f));
 
     //Clear the depth buffer.
     mpDeviceContext->ClearDepthStencilView(mpDepthStencilView,D3D11_CLEAR_DEPTH,
         1.0f,0);
+
+
+
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
+
+    //Select which vertex buffer to display.
+    mpDeviceContext->IASetVertexBuffers(0,1,&mpVertexBuffer,&stride,&offset);
+
+    //Select which primitive type is used.
+    mpDeviceContext->IASetPrimitiveTopology(
+        D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    //Draw the vertex buffer to the back buffer.
+    mpDeviceContext->Draw(3,0);
+
+
 
     if (!mVerticalSync)
     {

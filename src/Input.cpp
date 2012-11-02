@@ -15,7 +15,7 @@ Input::~Input()
 {
 }
 
-bool Input::KeyPressEvent(unsigned int key)
+bool Input::KeyPressEvent(uint key)
 {
     LOG(TO_STRING(key));
 
@@ -25,7 +25,7 @@ bool Input::KeyPressEvent(unsigned int key)
     return true;
 }
 
-bool Input::KeyReleaseEvent(unsigned int key)
+bool Input::KeyReleaseEvent(uint key)
 {
     return true;
 }

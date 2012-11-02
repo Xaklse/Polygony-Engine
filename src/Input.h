@@ -19,8 +19,8 @@ public:
     Input(System* pSystem);
     virtual ~Input();
 
-    bool KeyPressEvent(unsigned int key);
-    bool KeyReleaseEvent(unsigned int key);
+    bool KeyPressEvent(uint key);
+    bool KeyReleaseEvent(uint key);
 
 protected:
     System* mpSystem;

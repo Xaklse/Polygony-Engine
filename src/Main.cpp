@@ -48,7 +48,7 @@ int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
 
     System* pSystem = new System();
 
-    int result = pSystem->Run(hInstance,std::string(lpCommandLine));
+    int result = pSystem->Run(hInstance,string(lpCommandLine));
 
     delete pSystem;
 
