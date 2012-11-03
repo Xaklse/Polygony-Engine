@@ -47,24 +47,32 @@ bool System::Initialize()
 {
     try
     {
+        //Start the time to measure it.
         mStopWatch.start();
 
+        //Allocate a Windows console if it doesn't exist.
         bool result = AllocConsole() != 0;
 
+        //Create a POCO channel assigned to the Windows console.
         Poco::AutoPtr<Poco::WindowsConsoleChannel> pConsoleChannel(
             new Poco::WindowsConsoleChannel());
 
+        //Create a POCO channel assigned to a logging file.
         Poco::AutoPtr<Poco::FileChannel> pFileChannel(new Poco::FileChannel());
         pFileChannel->setProperty("path","log.log");
         pFileChannel->setProperty("rotation","10 M");
 
+        //Create a POCO channel that sends a message to the console channel and
+        //the logging file simultaneously.
         Poco::AutoPtr<Poco::SplitterChannel> pSplitterChannel(
             new Poco::SplitterChannel());
         pSplitterChannel->addChannel(pConsoleChannel);
         pSplitterChannel->addChannel(pFileChannel);
 
+        //Assign the new splitter channel to the logger object.
         Poco::Logger::root().setChannel(pSplitterChannel);
 
+        //Log the current date and time.
         Poco::Logger::root().information(Poco::DateTimeFormatter::format(
             Poco::LocalDateTime(),Poco::DateTimeFormat::HTTP_FORMAT));
 
@@ -77,6 +85,7 @@ bool System::Initialize()
 
         Log("Loading configurable options...");
 
+        //Load the system settings from the main configuration file.
         Poco::AutoPtr<Poco::Util::IniFileConfiguration> pConfigurationFile(
             new Poco::Util::IniFileConfiguration(INI_FILE));
 
@@ -201,6 +210,7 @@ void System::Shutdown()
         Log("Shutting down Polygony Engine...");
         Poco::Logger::root().information("");
 
+        //Stop the measured time.
         mStopWatch.stop();
 
         spSystem = NULL;

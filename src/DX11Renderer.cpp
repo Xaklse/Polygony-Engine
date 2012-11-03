@@ -116,7 +116,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
 
     mVerticalSync = verticalSync;
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     DXGI_SWAP_CHAIN_DESC swapChainDescriptor;
 
@@ -153,64 +153,71 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
         D3D_DRIVER_TYPE_HARDWARE,NULL,NULL,NULL,NULL,D3D11_SDK_VERSION,
         &swapChainDescriptor,&mpSwapChain,&mpDevice,NULL,&mpDeviceContext);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateDeviceAndSwapChain).",
             result);
     }
 
+////////////////////////////////////////////////////////////////////////////////
 
-
+    //Get a pointer to the DXGI device interface.
     IDXGIDevice* pDeviceInterface;
     result = mpDevice->QueryInterface(__uuidof(IDXGIDevice),
-        (void **)&pDeviceInterface);
+        (void**)&pDeviceInterface);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (QueryInterface).",
             result);
     }
 
+    //Get a pointer to the DXGI adapter interface which often represents a video
+    //card.
     IDXGIAdapter* pAdapter;
     result = pDeviceInterface->GetParent(__uuidof(IDXGIAdapter),
-        (void **)&pAdapter);
+        (void**)&pAdapter);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (GetParent Adapter).",
             result);
     }
 
+    //Get a pointer to the DXGI factory interface which can generate other DXGI
+    //objects and handle full-screen transitions.
     IDXGIFactory* pFactory;
-    result = pAdapter->GetParent(__uuidof(IDXGIFactory),(void **)&pFactory);
+    result = pAdapter->GetParent(__uuidof(IDXGIFactory),(void**)&pFactory);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (GetParent Factory).",
             result);
     }
 
+    //Ignore full-screen transitions through the Alt+Enter key combination.
     result = pFactory->MakeWindowAssociation(mpSystem->GetWindowHandle(),
         DXGI_MWA_NO_ALT_ENTER);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (MakeWindowAssociation).",
             result);
     }
 
+    //The pointers are no longer needed.
     pFactory->Release();
     pAdapter->Release();
     pDeviceInterface->Release();
 
+////////////////////////////////////////////////////////////////////////////////
 
-
-    //Get the pointer to the back buffer.
+    //Get a pointer to the back buffer.
     ID3D11Texture2D* pTexture;
     result = mpSwapChain->GetBuffer(0,__uuidof(ID3D11Texture2D),
         (LPVOID*)&pTexture);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (GetBuffer).",result);
     }
@@ -219,7 +226,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDevice->CreateRenderTargetView(pTexture,NULL,
         &mpBackBufferRenderTarget);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateRenderTargetView).",
             result);
@@ -228,7 +235,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //The pointer to the back buffer is no longer needed.
     pTexture->Release();
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     D3D11_TEXTURE2D_DESC textureDescriptor;
 
@@ -252,13 +259,13 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDevice->CreateTexture2D(&textureDescriptor,NULL,
         &mpDepthBufferTexture);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateTexture2D Depth).",
             result);
     }
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     D3D11_DEPTH_STENCIL_DESC depthStencilDescriptor;
 
@@ -285,7 +292,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDevice->CreateDepthStencilState(&depthStencilDescriptor,
         &mpDepthStencilState);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateDepthStencilState).",
             result);
@@ -294,7 +301,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //Set the depth-stencil state of the output-merger stage.
     mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState,1);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDescriptor;
 
@@ -311,7 +318,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDevice->CreateDepthStencilView(mpDepthBufferTexture,
         &depthStencilViewDescriptor,&mpDepthStencilView);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateDepthStencilView).",
             result);
@@ -322,7 +329,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     mpDeviceContext->OMSetRenderTargets(1,&mpBackBufferRenderTarget,
         mpDepthStencilView);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     D3D11_RASTERIZER_DESC rasterizerDescriptor;
 
@@ -345,7 +352,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDevice->CreateRasterizerState(&rasterizerDescriptor,
         &mpRasterizerState);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateRasterizerState).",
             result);
@@ -354,7 +361,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //Set the rasterizer state.
     mpDeviceContext->RSSetState(mpRasterizerState);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     D3D11_VIEWPORT viewport;
 
@@ -372,7 +379,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //Activate the viewport.
     mpDeviceContext->RSSetViewports(1,&viewport);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     //Create the projection matrix for 3D rendering; uses a left-handed
     //coordinate system.
@@ -387,7 +394,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     D3DXMatrixOrthoLH(&mOrthoMatrix,static_cast<float>(width),
         static_cast<float>(height),0.1f,1000.0f);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     //Create a triangle using the vertex structure.
     Vertex vertices[] =
@@ -397,7 +404,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
         {D3DXVECTOR3(-0.45f,-0.5f,0.0f),D3DXCOLOR(0.0f,0.0f,1.0f,1.0f)}
     };
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     D3D11_BUFFER_DESC bufferDescriptor;
 
@@ -413,13 +420,13 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //Create the vertex buffer.
     result = mpDevice->CreateBuffer(&bufferDescriptor,NULL,&mpVertexBuffer);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateVertexBuffer).",
             result);
     }
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     //Provides access to subresource data.
     D3D11_MAPPED_SUBRESOURCE mappedSubresource;
@@ -428,7 +435,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDeviceContext->Map(mpVertexBuffer,NULL,D3D11_MAP_WRITE_DISCARD,
         NULL,&mappedSubresource);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (MapVertexBuffer).",
             result);
@@ -440,7 +447,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //Unmap the buffer (unblock it).
     mpDeviceContext->Unmap(mpVertexBuffer,NULL);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     //Interfaces used to return arbitrary length data.
     ID3D10Blob* pVertexShaderBlob;
@@ -450,7 +457,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = D3DX11CompileFromFile(L"shaders.hlsl",NULL,NULL,"VShader","vs_5_0",
         0,0,NULL,&pVertexShaderBlob,NULL,NULL);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CompileVertexShader).",
             result);
@@ -460,7 +467,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = D3DX11CompileFromFile(L"shaders.hlsl",NULL,NULL,"PShader","ps_5_0",
         0,0,NULL,&pPixelShaderBlob,NULL,NULL);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CompilePixelShader).",
             result);
@@ -470,7 +477,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDevice->CreateVertexShader(pVertexShaderBlob->GetBufferPointer(),
         pVertexShaderBlob->GetBufferSize(),NULL,&mpVertexShader);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateVertexShader).",
             result);
@@ -480,7 +487,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     result = mpDevice->CreatePixelShader(pPixelShaderBlob->GetBufferPointer(),
         pPixelShaderBlob->GetBufferSize(),NULL,&mpPixelShader);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreatePixelShader).",
             result);
@@ -492,7 +499,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //Set the pixel shader object as active and ready for the device.
     mpDeviceContext->PSSetShader(mpPixelShader,NULL,0);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     //Initialize the descriptor of the input-layout object.
     D3D11_INPUT_ELEMENT_DESC inputElementDescriptor[] =
@@ -508,7 +515,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
         pVertexShaderBlob->GetBufferPointer(),
         pVertexShaderBlob->GetBufferSize(),&mpInputLayout);
 
-    if (result != S_OK)
+    if (FAILED(result))
     {
         throw Exception("Direct3D 11 init failed (CreateInputLayout).",
             result);
@@ -517,7 +524,7 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     //Bind the input-layout object to the input-assembler stage.
     mpDeviceContext->IASetInputLayout(mpInputLayout);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     return true;
 }
@@ -532,7 +539,7 @@ bool DX11Renderer::Render()
     mpDeviceContext->ClearDepthStencilView(mpDepthStencilView,D3D11_CLEAR_DEPTH,
         1.0f,0);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
@@ -547,7 +554,7 @@ bool DX11Renderer::Render()
     //Draw the vertex buffer to the back buffer.
     mpDeviceContext->Draw(3,0);
 
-
+////////////////////////////////////////////////////////////////////////////////
 
     if (!mVerticalSync)
     {
