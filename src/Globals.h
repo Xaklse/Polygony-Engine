@@ -4,6 +4,9 @@
 
 
 #include "Poco/Types.h"
+#include "vectormath/vmInclude.h" //An optional header file from Bullet Physics,
+                                  //provides functions for 3D/4D vectors,
+                                  //3x3/4x4 matrices and quaternions.
 
 
 typedef unsigned int uint;
@@ -23,6 +26,9 @@ typedef double float64;
 
 typedef std::string string;
 
+typedef Vectormath::Aos::Vector3 Vector3;
+typedef Vectormath::Aos::Vector4 Vector4;
+
 
 #define PI 3.14159265358979323846f
 
@@ -30,6 +36,7 @@ typedef std::string string;
 #define INI_FILE "config.ini"
 #define LOG mpSystem->Log
 #define TO_STRING boost::lexical_cast<string>
+#define VMATH Vectormath::Aos
 
 
 #endif //POLY_GLOBALS_H

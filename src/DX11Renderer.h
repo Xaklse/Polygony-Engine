@@ -38,8 +38,8 @@ public:
 private:
     struct Vertex
     {
-        D3DXVECTOR3 Position;
-        D3DXCOLOR Color;
+        float Position[3];
+        float Color[4];
     };
 
     bool mVerticalSync;
@@ -72,6 +72,7 @@ private:
     D3DXMATRIX mProjectionMatrix;
     D3DXMATRIX mWorldMatrix;
 
+    ID3D11Buffer* mpIndexBuffer;
     ID3D11InputLayout* mpInputLayout;
     ID3D11PixelShader* mpPixelShader;
     ID3D11Buffer* mpVertexBuffer;

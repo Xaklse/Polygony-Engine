@@ -18,10 +18,11 @@
 #include <windowsx.h>
 
 
-#include "boost/lexical_cast.hpp"
+#include "Boost/lexical_cast.hpp"
 #include "Poco/Logger.h"
 #include "Poco/String.h"
 #include "Poco/StopWatch.h"
+#include "btBulletDynamicsCommon.h" //Bullet Physics library.
 
 
 #include "Globals.h"
