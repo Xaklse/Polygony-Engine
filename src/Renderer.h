@@ -13,10 +13,10 @@ namespace Poly
 class System;
 
 
-class Renderer
+class Renderer : private boost::noncopyable
 {
 public:
-    Renderer(System* pSystem);
+    Renderer();
     virtual ~Renderer();
 
     virtual bool Initialize(uint width,uint height,bool fullScreen,
@@ -24,9 +24,6 @@ public:
 
     virtual bool Render();
     virtual bool WindowResize();
-
-protected:
-    System* mpSystem;
 };
 
 

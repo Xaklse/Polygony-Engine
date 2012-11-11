@@ -6,9 +6,8 @@ namespace Poly
 {
 
 
-Input::Input(System* pSystem)
+Input::Input()
 {
-    mpSystem = pSystem;
 }
 
 Input::~Input()
@@ -20,7 +19,7 @@ bool Input::KeyPressEvent(uint key)
     LOG(TO_STRING(key));
 
     if (key == 27)
-        mpSystem->Exit();
+        Poly::System::Get()->Exit();
 
     return true;
 }

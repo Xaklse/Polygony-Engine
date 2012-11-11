@@ -6,9 +6,8 @@ namespace Poly
 {
 
 
-Renderer::Renderer(System* pSystem)
+Renderer::Renderer()
 {
-    mpSystem = pSystem;
 }
 
 Renderer::~Renderer()

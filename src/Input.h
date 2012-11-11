@@ -13,17 +13,14 @@ namespace Poly
 class System;
 
 
-class Input
+class Input : private boost::noncopyable
 {
 public:
-    Input(System* pSystem);
+    Input();
     virtual ~Input();
 
     bool KeyPressEvent(uint key);
     bool KeyReleaseEvent(uint key);
-
-protected:
-    System* mpSystem;
 };
 
 

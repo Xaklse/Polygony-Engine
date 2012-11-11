@@ -21,12 +21,15 @@ namespace Poly
 {
 
 
+static System* spSystem = nullptr;
+
+
 System::System()
 {
-    mInstanceHandle = NULL;
-    mpInput = NULL;
-    mpRenderer = NULL;
-    mWindowHandle = NULL;
+    mInstanceHandle = nullptr;
+    mpInput = nullptr;
+    mpRenderer = nullptr;
+    mWindowHandle = nullptr;
 
     mWindowClass = L"PolygonyEngine";
 
@@ -80,7 +83,8 @@ bool System::Initialize()
 
         if (!result)
         {
-            throw Exception("Console allocation failed.",GetLastError());
+            throw Exception("Console allocation failed." + DEBUG_INFO,
+                GetLastError());
         }
 
         Log("Loading configurable options...");
@@ -119,7 +123,7 @@ bool System::Initialize()
 
         //Fill in the structure with the needed information.
         windowClass.cbSize = sizeof(WNDCLASSEX);
-        windowClass.hCursor = LoadCursor(NULL,IDC_ARROW);
+        windowClass.hCursor = LoadCursor(nullptr,IDC_ARROW);
         windowClass.hInstance = mInstanceHandle;
         windowClass.lpfnWndProc = WndProc;
         windowClass.lpszClassName = mWindowClass;
@@ -135,16 +139,17 @@ bool System::Initialize()
         AdjustWindowRect(&windowRect,WS_OVERLAPPEDWINDOW,FALSE);
 
         //Create the window and use the result as the handle.
-        mWindowHandle = CreateWindowEx(NULL,mWindowClass,L"Polygony Engine",
+        mWindowHandle = CreateWindowEx(0,mWindowClass,L"Polygony Engine",
             WS_OVERLAPPEDWINDOW,(GetSystemMetrics(SM_CXSCREEN) - width) / 2,
             (GetSystemMetrics(SM_CYSCREEN) - height) / 2,
             windowRect.right - windowRect.left,
             windowRect.bottom - windowRect.top,
-            NULL,NULL,mInstanceHandle,NULL);
+            nullptr,nullptr,mInstanceHandle,nullptr);
 
-        if (mWindowHandle == NULL)
+        if (mWindowHandle == nullptr)
         {
-            throw Exception("Window creation failed.",GetLastError());
+            throw Exception("Window creation failed." + DEBUG_INFO,
+                GetLastError());
         }
 
         //Display the window on the screen.
@@ -154,8 +159,8 @@ bool System::Initialize()
         SetForegroundWindow(mWindowHandle);
         SetFocus(mWindowHandle);
 
-        mpInput = new Input(this);
-        mpRenderer = new DX11Renderer(this);
+        mpInput = new Input();
+        mpRenderer = new DX11Renderer();
 
         result = mpRenderer->Initialize(width,height,fullScreen,
             pConfigurationFile->getBool("System.VerticalSync",false));
@@ -181,31 +186,31 @@ bool System::Initialize()
 
 void System::Shutdown()
 {
-    if (mpInput != NULL)
+    if (mpInput != nullptr)
     {
         delete mpInput;
-        mpInput = NULL;
+        mpInput = nullptr;
     }
 
-    if (mpRenderer != NULL)
+    if (mpRenderer != nullptr)
     {
         delete mpRenderer;
-        mpRenderer = NULL;
+        mpRenderer = nullptr;
     }
 
-    if (mWindowHandle != NULL)
+    if (mWindowHandle != nullptr)
     {
         DestroyWindow(mWindowHandle);
-        mWindowHandle = NULL;
+        mWindowHandle = nullptr;
     }
 
-    if (mInstanceHandle != NULL)
+    if (mInstanceHandle != nullptr)
     {
         UnregisterClass(mWindowClass,mInstanceHandle);
-        mInstanceHandle = NULL;
+        mInstanceHandle = nullptr;
     }
 
-    if (spSystem != NULL)
+    if (spSystem != nullptr)
     {
         Log("Shutting down Polygony Engine...");
         Poco::Logger::root().information("");
@@ -213,10 +218,11 @@ void System::Shutdown()
         //Stop the measured time.
         mStopWatch.stop();
 
-        spSystem = NULL;
+        spSystem = nullptr;
     }
 }
 
+/*static*/ inline
 void System::Log(const string& message)
 {
     Poco::Logger::root().information(Poco::cat(Poco::DateTimeFormatter::format(
@@ -242,7 +248,7 @@ int System::Run(HINSTANCE instanceHandle,const string& commandLine)
         while (loop)
         {
             //Handle the Windows messages.
-            if (PeekMessage(&message,NULL,0,0,PM_REMOVE))
+            if (PeekMessage(&message,nullptr,0,0,PM_REMOVE))
             {
                 TranslateMessage(&message);
                 DispatchMessage(&message);
@@ -293,7 +299,7 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
 
         //Check if a key has been pressed on the keyboard.
         case WM_KEYDOWN:
-            if (mpInput != NULL)
+            if (mpInput != nullptr)
             {
                 return mpInput->KeyPressEvent(
                     static_cast<uint>(firstParam));
@@ -301,7 +307,7 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
 
         //Check if a key has been released on the keyboard.
         case WM_KEYUP:
-            if (mpInput != NULL)
+            if (mpInput != nullptr)
             {
                 return mpInput->KeyReleaseEvent(
                     static_cast<uint>(firstParam));
@@ -309,7 +315,7 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
 
         //Check if the window size has changed.
         case WM_SIZE:
-            if (mpRenderer != NULL)
+            if (mpRenderer != nullptr)
             {
                 return mpRenderer->WindowResize();
             }
@@ -318,10 +324,11 @@ bool System::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
     return false;
 }
 
-HWND System::GetWindowHandle()
+/*static*/
+System* System::Get()
 {
-    return mWindowHandle;
-}
+    return spSystem;
+};
 
 
 }

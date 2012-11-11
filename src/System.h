@@ -3,26 +3,9 @@
 #define POLY_SYSTEM_H
 
 
-#include <iostream> //Provides input and output functionality using streams. A
-                    //stream is an abstraction that represents a device on which
-                    //input and ouput operations are performed.
-#include <stdlib.h> //Includes several general purpose functions for dynamic
-                    //memory management, random number generation,
-                    //communication with the environment, integer arithmetics,
-                    //searching, sorting and converting.
-#include <string>   //Includes the string class of the Standard Template
-                    //Library (STL).
-
 //Header files useful for Windows programming.
 #include <windows.h>
 #include <windowsx.h>
-
-
-#include "Boost/lexical_cast.hpp"
-#include "Poco/Logger.h"
-#include "Poco/String.h"
-#include "Poco/StopWatch.h"
-#include "btBulletDynamicsCommon.h" //Bullet Physics library.
 
 
 #include "Globals.h"
@@ -34,20 +17,21 @@ namespace Poly
 {
 
 
-class System
+class System : private boost::noncopyable
 {
 public:
     System();
     virtual ~System();
 
     void Exit();
-    void Log(const string& message);
+    static void Log(const string& message);
     int Run(HINSTANCE instanceHandle,const string& commandLine);
 
     bool WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
         LPARAM secondParam);
 
-    HWND GetWindowHandle();
+    static System* Get();
+    HWND WindowHandle() { return mWindowHandle; };
 
 private:
     bool Initialize();
@@ -55,16 +39,15 @@ private:
 
     Input* mpInput;
     Renderer* mpRenderer;
-    System* mpSystem;
 
     /*Handle to the application instance.*/
     HINSTANCE mInstanceHandle;
 
-    /*Handle to the main window.*/
-    HWND mWindowHandle;
-
     /*String which specifies the window class name.*/
     LPCWSTR mWindowClass;
+
+    /*Handle to the main window.*/
+    HWND mWindowHandle;
 
     Poco::Stopwatch mStopWatch;
 };
@@ -73,14 +56,22 @@ private:
 }
 
 
-static Poly::System* spSystem;
-static LRESULT CALLBACK WndProc(HWND hWnd,UINT message,WPARAM wParam,
-    LPARAM lParam)
+/**
+ * Receives all input directed at a window.
+ * @param windowHandle  unique handle of the window
+ * @param intMessage    received message
+ * @param firstParam    first extra value
+ * @param secondParam   second extra value
+ * @return              exit value; 0 means the message has been handled
+ */
+static LRESULT CALLBACK WndProc(HWND windowHandle,UINT intMessage,
+    WPARAM firstParam,LPARAM secondParam)
 {
-    if (spSystem != NULL && !spSystem->WindowEvent(hWnd,message,wParam,lParam))
+    if (!Poly::System::Get()->WindowEvent(windowHandle,intMessage,
+        firstParam,secondParam))
     {
         //Send the event to the default message handler.
-        return DefWindowProc(hWnd,message,wParam,lParam);
+        return DefWindowProc(windowHandle,intMessage,firstParam,secondParam);
     }
 
     return 0;

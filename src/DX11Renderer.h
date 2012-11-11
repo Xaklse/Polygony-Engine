@@ -27,7 +27,7 @@ namespace Poly
 class DX11Renderer : public Renderer
 {
 public:
-    DX11Renderer(System* system);
+    DX11Renderer();
     virtual ~DX11Renderer();
 
     virtual bool Initialize(uint width,uint height,bool fullScreen,

@@ -35,20 +35,18 @@
 
 /**
  * The entry point for any program based on Windows.
- * @param hInstance      integer which identifies this application
- * @param hPrevInstance  obsolete
- * @param lpCommandLine  long pointer to string that contains the command line
- * @param nShowCommand   indicates how the window is to appear when created
- * @return               exit value of the program; 0 means no errors
+ * @param instanceHandle  integer which identifies this application
+ * @param hPrevInstance   obsolete
+ * @param lpCommandLine   long pointer to string that contains the command line
+ * @param nShowCommand    indicates how the window is to appear when created
+ * @return                exit value of the program; 0 means no errors
  */
-int WINAPI WinMain(HINSTANCE hInstance,HINSTANCE hPrevInstance,
+int WINAPI WinMain(HINSTANCE instanceHandle,HINSTANCE hPrevInstance,
     LPSTR lpCommandLine,int nShowCommand)
 {
-    using namespace Poly;
+    Poly::System* pSystem = new Poly::System();
 
-    System* pSystem = new System();
-
-    int result = pSystem->Run(hInstance,string(lpCommandLine));
+    int result = pSystem->Run(instanceHandle,string(lpCommandLine));
 
     delete pSystem;
 
