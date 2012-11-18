@@ -16,10 +16,11 @@ Input::~Input()
 
 bool Input::KeyPressEvent(uint key)
 {
-    LOG(TO_STRING(key));
-
     if (key == 27)
+    {
+        //Esc key.
         Poly::System::Get()->Exit();
+    }
 
     return true;
 }

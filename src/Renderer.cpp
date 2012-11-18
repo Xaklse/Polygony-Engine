@@ -14,17 +14,18 @@ Renderer::~Renderer()
 {
 }
 
-bool Renderer::Initialize(uint width,uint height,bool fullScreen,
+/*virtual*/
+void Renderer::Initialize(uint width,uint height,bool fullScreen,
     bool verticalSync)
 {
-    return true;
 }
 
-bool Renderer::Render()
+/*virtual*/
+void Renderer::Render()
 {
-    return true;
 }
 
+/*virtual*/
 bool Renderer::WindowResize()
 {
     return false;

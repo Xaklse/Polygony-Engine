@@ -6,6 +6,7 @@
 
 
 #include "Exception.h"
+#include "WinSystem.h"
 
 
 namespace Poly
@@ -115,7 +116,8 @@ DX11Renderer::~DX11Renderer()
     }
 }
 
-bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
+/*virtual*/
+void DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     bool verticalSync)
 {
     LOG("Initializing DirectX 11 renderer...");
@@ -137,7 +139,8 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
         DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
     swapChainDescriptor.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDescriptor.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-    swapChainDescriptor.OutputWindow = Poly::System::Get()->WindowHandle();
+    swapChainDescriptor.OutputWindow = static_cast<Poly::WinSystem*>(
+        Poly::System::Get())->WindowHandle();
     swapChainDescriptor.SampleDesc.Count = 1;
     swapChainDescriptor.SampleDesc.Quality = 0;
     swapChainDescriptor.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -203,7 +206,8 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
 
     //Ignore full-screen transitions through the Alt+Enter key combination.
     result = pFactory->MakeWindowAssociation(
-        Poly::System::Get()->WindowHandle(),DXGI_MWA_NO_ALT_ENTER);
+        static_cast<Poly::WinSystem*>(Poly::System::Get())->WindowHandle(),
+        DXGI_MWA_NO_ALT_ENTER);
 
     if (FAILED(result))
     {
@@ -556,13 +560,10 @@ bool DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
 
     //Bind the input-layout object to the input-assembler stage.
     mpDeviceContext->IASetInputLayout(mpInputLayout);
-
-////////////////////////////////////////////////////////////////////////////////
-
-    return true;
 }
 
-bool DX11Renderer::Render()
+/*virtual*/
+void DX11Renderer::Render()
 {
     //Clear the back buffer to plain black color.
     mpDeviceContext->ClearRenderTargetView(mpBackBufferRenderTarget,
@@ -602,8 +603,6 @@ bool DX11Renderer::Render()
         //Switch the front buffer with the back buffer.
         mpSwapChain->Present(1,0);
     }
-
-    return true;
 }
 
 

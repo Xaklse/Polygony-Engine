@@ -19,10 +19,10 @@ public:
     Renderer();
     virtual ~Renderer();
 
-    virtual bool Initialize(uint width,uint height,bool fullScreen,
+    virtual void Initialize(uint width,uint height,bool fullScreen,
         bool verticalSync);
 
-    virtual bool Render();
+    virtual void Render();
     virtual bool WindowResize();
 };
 

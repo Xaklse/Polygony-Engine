@@ -3,8 +3,6 @@
 #define POLY_DX11_RENDERER_H
 
 
-#include <windows.h> //Header file useful for Windows programming.
-
 //Header files which contain all the Direct3D functionality for setting up and
 //drawing 3D graphics in DirectX as well as tools to interface with hardware.
 #include <d3d11.h>
@@ -30,10 +28,10 @@ public:
     DX11Renderer();
     virtual ~DX11Renderer();
 
-    virtual bool Initialize(uint width,uint height,bool fullScreen,
+    virtual void Initialize(uint width,uint height,bool fullScreen,
         bool verticalSync);
 
-    virtual bool Render();
+    virtual void Render();
 
 private:
     struct Vertex

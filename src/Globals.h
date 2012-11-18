@@ -16,6 +16,7 @@
 #include "Boost/lexical_cast.hpp"
 #include "Boost/utility.hpp"
 
+#include "Poco/Environment.h"
 #include "Poco/Logger.h"
 #include "Poco/Types.h"
 #include "Poco/String.h"
@@ -53,6 +54,7 @@ typedef Vectormath::Aos::Vector4 Vector4;
 #define VMATH Vectormath::Aos
 
 #define INI_FILE "config.ini"
+#define LOG_FILE "log.log"
 #define PI 3.14159265358979323846f
 
 #define LOG(x) Poly::System::Log(x)
