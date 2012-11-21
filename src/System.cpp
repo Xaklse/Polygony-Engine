@@ -12,48 +12,30 @@ namespace Poly
 static System* spSystem = nullptr;
 
 
-System::System()
+System::System() :
+    mErrorCode(0),
+
+    mpInput(nullptr),
+    mpRenderer(nullptr)
 {
     spSystem = this;
-
-    mErrorCode = 0;
-
-    mpInput = nullptr;
-    mpRenderer = nullptr;
 }
 
 System::~System()
 {
-    if (mpRenderer != nullptr)
+    if (mpRenderer.get() != nullptr)
     {
-        delete mpRenderer;
-        mpRenderer = nullptr;
+        mpRenderer.reset(nullptr);
     }
 
     if (mpInput != nullptr)
     {
-        delete mpInput;
-        mpInput = nullptr;
+        mpInput.reset(nullptr);
     }
 
     Poco::Logger::root().information("");
 
     spSystem = nullptr;
-}
-
-/*virtual*/
-void System::Exit()
-{
-}
-
-/*virtual*/
-void System::Initialize()
-{
-}
-
-/*virtual*/
-void System::Shutdown()
-{
 }
 
 /*static*/

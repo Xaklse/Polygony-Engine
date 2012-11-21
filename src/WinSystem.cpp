@@ -2,15 +2,12 @@
 #include "WinSystem.h"
 
 
-#include "Poco/AutoPtr.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/FileChannel.h"
 #include "Poco/LocalDateTime.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/WindowsConsoleChannel.h"
-
-#include "Poco/Util/IniFileConfiguration.h"
 
 
 #include "DX11Renderer.h"
@@ -65,10 +62,11 @@ namespace Poly
 {
 
 
-WinSystem::WinSystem() : System()
+WinSystem::WinSystem() : System(),
+    mpConfigurationFile(nullptr),
+    mInstanceHandle(nullptr),
+    mWindowHandle(nullptr)
 {
-    mInstanceHandle = nullptr;
-    mWindowHandle = nullptr;
 }
 
 WinSystem::~WinSystem()
@@ -83,6 +81,11 @@ WinSystem::~WinSystem()
     {
         UnregisterClass(mWindowClassName,mInstanceHandle);
         mInstanceHandle = nullptr;
+    }
+
+    if (mpConfigurationFile.get() != nullptr)
+    {
+        mpConfigurationFile = nullptr;
     }
 }
 
@@ -142,19 +145,18 @@ void WinSystem::Initialize()
         LOG("Loading configurable options...");
 
         //Load the system settings from the main configuration file.
-        Poco::AutoPtr<Poco::Util::IniFileConfiguration> pConfigurationFile(
-            new Poco::Util::IniFileConfiguration(INI_FILE));
+        mpConfigurationFile = new Poco::Util::IniFileConfiguration(INI_FILE);
 
-        bool fullScreen = pConfigurationFile->getBool("System.Fullscreen",
+        bool fullScreen = mpConfigurationFile->getBool("System.Fullscreen",
             false);
-        uint fullscreenWidth = pConfigurationFile->getInt("System.FullscreenX",
+        uint fullscreenWidth = mpConfigurationFile->getInt("System.FullscreenX",
             1280);
-        uint fullscreenHeight = pConfigurationFile->getInt("System.FullscreenY",
-            720);
-        uint windowWidth = pConfigurationFile->getInt("System.WindowedX",800);
-        uint windowHeight = pConfigurationFile->getInt("System.WindowedY",600);
-        string windowTitle = pConfigurationFile->getString("System.WindowTitle",
-            "Polygony Engine");
+        uint fullscreenHeight = mpConfigurationFile->getInt(
+            "System.FullscreenY",720);
+        uint windowWidth = mpConfigurationFile->getInt("System.WindowedX",800);
+        uint windowHeight = mpConfigurationFile->getInt("System.WindowedY",600);
+        string windowTitle = mpConfigurationFile->getString(
+            "System.WindowTitle","Polygony Engine");
 
         uint width = fullScreen ? fullscreenWidth : windowWidth;
         uint height = fullScreen ? fullscreenHeight : windowHeight;
@@ -214,11 +216,10 @@ void WinSystem::Initialize()
         SetForegroundWindow(mWindowHandle);
         SetFocus(mWindowHandle);
 
-        mpInput = new Input();
-        mpRenderer = new DX11Renderer();
+        mpInput.reset(new Input());
+        mpRenderer.reset(new DX11Renderer());
 
-        mpRenderer->Initialize(width,height,fullScreen,
-            pConfigurationFile->getBool("System.VerticalSync",false));
+        mpRenderer->Initialize(width,height,fullScreen);
 
         LOG("Initialization took " + TO_STRING(
             static_cast<float>(mStopWatch.elapsed()) /
@@ -247,16 +248,14 @@ void WinSystem::Shutdown()
 {
     LOG("Shutting down Polygony Engine...");
 
-    if (mpInput != nullptr)
+    if (mpRenderer.get() != nullptr)
     {
-        delete mpInput;
-        mpInput = nullptr;
+        mpRenderer.reset(nullptr);
     }
 
-    if (mpRenderer != nullptr)
+    if (mpInput != nullptr)
     {
-        delete mpRenderer;
-        mpRenderer = nullptr;
+        mpInput.reset(nullptr);
     }
 
     if (mWindowHandle != nullptr)
@@ -269,6 +268,11 @@ void WinSystem::Shutdown()
     {
         UnregisterClass(mWindowClassName,mInstanceHandle);
         mInstanceHandle = nullptr;
+    }
+
+    if (mpConfigurationFile.get() != nullptr)
+    {
+        mpConfigurationFile = nullptr;
     }
 
     //Stop the measured time.

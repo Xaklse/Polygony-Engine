@@ -28,10 +28,10 @@ public:
     DX11Renderer();
     virtual ~DX11Renderer();
 
-    virtual void Initialize(uint width,uint height,bool fullScreen,
-        bool verticalSync);
+    virtual void Initialize(uint width,uint height,bool fullScreen);
 
     virtual void Render();
+    virtual bool WindowResize();
 
 private:
     struct Vertex

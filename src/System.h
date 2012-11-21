@@ -18,7 +18,7 @@ public:
     System();
     virtual ~System();
 
-    virtual void Exit();
+    virtual void Exit() = 0;
     static void Log(const string& message);
     virtual void Run(const string& commandLine);
 
@@ -29,13 +29,13 @@ public:
     bool NoErrorCode() const { return mErrorCode == 0; }
 
 protected:
-    virtual void Initialize();
-    virtual void Shutdown();
+    virtual void Initialize() = 0;
+    virtual void Shutdown() = 0;
 
     int mErrorCode;
 
-    Input* mpInput;
-    Renderer* mpRenderer;
+    std::unique_ptr<Input> mpInput;
+    std::unique_ptr<Renderer> mpRenderer;
 
     Poco::Stopwatch mStopWatch;
 };

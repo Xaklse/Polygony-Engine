@@ -8,6 +8,10 @@
 #include <windowsx.h>
 
 
+#include "Poco/AutoPtr.h"
+#include "Poco/Util/IniFileConfiguration.h"
+
+
 #include "System.h"
 
 
@@ -27,11 +31,16 @@ public:
     virtual bool WindowEvent(HWND windowHandle,UINT intMessage,
         WPARAM firstParam,LPARAM secondParam);
 
+    Poco::Util::IniFileConfiguration* ConfigurationFile()
+        { return mpConfigurationFile.get(); };
     HWND WindowHandle() const { return mWindowHandle; };
 
 private:
     virtual void Initialize();
     virtual void Shutdown();
+
+    /*Pointer to the main configuration file.*/
+    Poco::AutoPtr<Poco::Util::IniFileConfiguration> mpConfigurationFile;
 
     /*Handle to the application instance.*/
     HINSTANCE mInstanceHandle;

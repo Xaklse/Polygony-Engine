@@ -13,21 +13,21 @@ namespace Poly
 {
 
 
-DX11Renderer::DX11Renderer() : Renderer()
-{
-    mpBackBufferRenderTarget = nullptr;
-    mpDepthBufferTexture = nullptr;
-    mpDepthStencilState = nullptr;
-    mpDepthStencilView = nullptr;
-    mpDevice = nullptr;
-    mpDeviceContext = nullptr;
-    mpRasterizerState = nullptr;
-    mpSwapChain = nullptr;
+DX11Renderer::DX11Renderer() : Renderer(),
+    mpBackBufferRenderTarget(nullptr),
+    mpDepthBufferTexture(nullptr),
+    mpDepthStencilState(nullptr),
+    mpDepthStencilView(nullptr),
+    mpDevice(nullptr),
+    mpDeviceContext(nullptr),
+    mpRasterizerState(nullptr),
+    mpSwapChain(nullptr),
 
-    mpInputLayout = nullptr;
-    mpPixelShader = nullptr;
-    mpVertexBuffer = nullptr;
-    mpVertexShader = nullptr;
+    mpInputLayout(nullptr),
+    mpPixelShader(nullptr),
+    mpVertexBuffer(nullptr),
+    mpVertexShader(nullptr)
+{
 }
 
 DX11Renderer::~DX11Renderer()
@@ -117,12 +117,12 @@ DX11Renderer::~DX11Renderer()
 }
 
 /*virtual*/
-void DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
-    bool verticalSync)
+void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
 {
     LOG("Initializing DirectX 11 renderer...");
 
-    mVerticalSync = verticalSync;
+    mVerticalSync = static_cast<WinSystem*>(Poly::System::Get())->
+        ConfigurationFile()->getBool("Renderer.VerticalSync",false);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -146,7 +146,7 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen,
     swapChainDescriptor.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     swapChainDescriptor.Windowed = fullScreen ? FALSE : TRUE;
 
-    if (!verticalSync)
+    if (!mVerticalSync)
     {
         swapChainDescriptor.BufferDesc.RefreshRate.Numerator = 0;
         swapChainDescriptor.BufferDesc.RefreshRate.Denominator = 1;
@@ -603,6 +603,12 @@ void DX11Renderer::Render()
         //Switch the front buffer with the back buffer.
         mpSwapChain->Present(1,0);
     }
+}
+
+/*virtual*/
+bool DX11Renderer::WindowResize()
+{
+    return false;
 }
 
 

@@ -6,6 +6,7 @@
 #include <iostream> //Provides input and output functionality using streams. A
                     //stream is an abstraction that represents a device on which
                     //input and ouput operations are performed.
+#include <memory> //Provides general utilities to manage memory.
 #include <stdlib.h> //Includes several general purpose functions for dynamic
                     //memory management, random number generation,
                     //communication with the environment, integer arithmetics,
