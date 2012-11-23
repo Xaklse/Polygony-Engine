@@ -10,9 +10,6 @@ namespace Poly
 {
 
 
-class System;
-
-
 class Input : private boost::noncopyable
 {
 public:
@@ -25,9 +22,6 @@ public:
 
 
 }
-
-
-#include "System.h"
 
 
 #endif //POLY_INPUT_H

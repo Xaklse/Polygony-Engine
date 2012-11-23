@@ -12,7 +12,8 @@ namespace Poly
 static System* spSystem = nullptr;
 
 
-System::System() :
+System::System() : Runnable(),
+    mCleanedUp(false),
     mErrorCode(0),
 
     mpInput(nullptr),
@@ -46,7 +47,7 @@ void System::Log(const string& message)
 }
 
 /*virtual*/
-void System::Run(const string& commandLine)
+void System::Run()
 {
     Initialize();
 

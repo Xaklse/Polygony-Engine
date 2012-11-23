@@ -19,9 +19,11 @@
 
 #include "Poco/Environment.h"
 #include "Poco/Logger.h"
-#include "Poco/Types.h"
-#include "Poco/String.h"
+#include "Poco/Runnable.h"
 #include "Poco/StopWatch.h"
+#include "Poco/String.h"
+#include "Poco/Thread.h"
+#include "Poco/Types.h"
 
 #include "vectormath/vmInclude.h" //An optional header file from Bullet Physics,
                                   //provides functions for 3D/4D vectors,

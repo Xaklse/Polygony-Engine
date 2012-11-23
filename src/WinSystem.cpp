@@ -27,11 +27,16 @@ int WINAPI WinMain(HINSTANCE instanceHandle,HINSTANCE hPrevInstance,
 {
     Poly::System* pSystem = new Poly::WinSystem();
 
-    pSystem->Run(static_cast<string>(lpCommandLine));
+    pSystem->CommandLine(static_cast<string>(lpCommandLine));
+
+    Poco::Thread* pThread = new Poco::Thread();
+    pThread->start(*pSystem);
+    pThread->join();
 
     int result = pSystem->ErrorCode();
 
     delete pSystem;
+    delete pThread;
 
     return result;
 }
@@ -70,6 +75,13 @@ WinSystem::WinSystem() : System(),
 }
 
 WinSystem::~WinSystem()
+{
+    if (!mCleanedUp)
+        CleanUp();
+}
+
+/*virtual*/
+void WinSystem::CleanUp()
 {
     if (mWindowHandle != nullptr)
     {
@@ -258,29 +270,16 @@ void WinSystem::Shutdown()
         mpInput.reset(nullptr);
     }
 
-    if (mWindowHandle != nullptr)
-    {
-        DestroyWindow(mWindowHandle);
-        mWindowHandle = nullptr;
-    }
+    CleanUp();
 
-    if (mInstanceHandle != nullptr)
-    {
-        UnregisterClass(mWindowClassName,mInstanceHandle);
-        mInstanceHandle = nullptr;
-    }
-
-    if (mpConfigurationFile.get() != nullptr)
-    {
-        mpConfigurationFile = nullptr;
-    }
+    mCleanedUp = true;
 
     //Stop the measured time.
     mStopWatch.stop();
 }
 
 /*virtual*/
-void WinSystem::Run(const string& commandLine)
+void WinSystem::Run()
 {
     Initialize();
 

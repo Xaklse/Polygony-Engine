@@ -26,7 +26,7 @@ public:
     virtual ~WinSystem();
 
     virtual void Exit();
-    virtual void Run(const string& commandLine);
+    virtual void Run();
 
     virtual bool WindowEvent(HWND windowHandle,UINT intMessage,
         WPARAM firstParam,LPARAM secondParam);
@@ -35,7 +35,8 @@ public:
         { return mpConfigurationFile.get(); };
     HWND WindowHandle() const { return mWindowHandle; };
 
-private:
+protected:
+    virtual void CleanUp();
     virtual void Initialize();
     virtual void Shutdown();
 

@@ -10,9 +10,6 @@ namespace Poly
 {
 
 
-class System;
-
-
 class Renderer : private boost::noncopyable
 {
 public:
@@ -27,9 +24,6 @@ public:
 
 
 }
-
-
-#include "System.h"
 
 
 #endif //POLY_RENDERER_H
