@@ -159,6 +159,9 @@ void WinSystem::Initialize()
         //Load the system settings from the main configuration file.
         mpConfigurationFile = new Poco::Util::IniFileConfiguration(INI_FILE);
 
+        mDesiredFramerate = static_cast<float>(mpConfigurationFile->getInt(
+            "System.DesiredFramerate",60));
+
         bool fullScreen = mpConfigurationFile->getBool("System.Fullscreen",
             false);
         uint fullscreenWidth = mpConfigurationFile->getInt("System.FullscreenX",
@@ -233,9 +236,7 @@ void WinSystem::Initialize()
 
         mpRenderer->Initialize(width,height,fullScreen);
 
-        LOG("Initialization took " + TO_STRING(
-            static_cast<float>(mStopWatch.elapsed()) /
-            static_cast<float>(mStopWatch.resolution())) + " seconds.");
+        LOG("Initialization took " + TO_STRING(ElapsedTime()) + " seconds.");
     }
     catch (Exception& exception)
     {
@@ -285,12 +286,12 @@ void WinSystem::Run()
 
     if (NoErrorCode())
     {
+        bool loop = true;
+
         MSG message;
 
         //Initialize the message structure.
         ZeroMemory(&message,sizeof(MSG));
-
-        bool loop = true;
 
         //Loop until there is a quit message from the window or the user.
         while (loop)
@@ -309,8 +310,11 @@ void WinSystem::Run()
             }
             else
             {
-                //Otherwise do the frame processing.
+                //Do the frame processing.
                 mpRenderer->Render();
+
+                //Sleep for a while if needed.
+                ThreadDynamicSleep();
 
                 loop = NoErrorCode();
             }

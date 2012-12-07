@@ -3,6 +3,14 @@
 #define POLY_GLOBALS_H
 
 
+//Turns off certain problematic macros related to header files of Windows.
+#define NOMINMAX
+#define VC_EXTRALEAN
+#define WINDOWS_LEAN_AND_MEAN
+
+
+#include <algorithm> //Defines a collection of functions especially designed to
+                     //be used on ranges of elements.
 #include <iostream> //Provides input and output functionality using streams. A
                     //stream is an abstraction that represents a device on which
                     //input and ouput operations are performed.
@@ -14,7 +22,9 @@
 #include <string> //Includes the string class of the Standard Template Library
                   //(STL).
 
+#include "Boost/algorithm/clamp.hpp"
 #include "Boost/lexical_cast.hpp"
+#include "Boost/math/constants/constants.hpp"
 #include "Boost/utility.hpp"
 
 #include "Poco/Environment.h"
@@ -58,7 +68,6 @@ typedef Vectormath::Aos::Vector4 Vector4;
 
 #define INI_FILE "config.ini"
 #define LOG_FILE "log.log"
-#define PI 3.14159265358979323846f
 
 #define LOG(x) Poly::System::Log(x)
 #define TO_STRING(x) boost::lexical_cast<string>(x)

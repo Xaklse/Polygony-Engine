@@ -3,6 +3,9 @@
 #define POLY_WINDOWS_SYSTEM_H
 
 
+#include "Globals.h"
+
+
 //Header files useful for Windows programming.
 #include <windows.h>
 #include <windowsx.h>

@@ -3,6 +3,9 @@
 #define POLY_DX11_RENDERER_H
 
 
+#include "Globals.h"
+
+
 //Header files which contain all the Direct3D functionality for setting up and
 //drawing 3D graphics in DirectX as well as tools to interface with hardware.
 #include <d3d11.h>

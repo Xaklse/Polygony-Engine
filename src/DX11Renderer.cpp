@@ -394,7 +394,8 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
 
     //Create the projection matrix for 3D rendering; uses a left-handed
     //coordinate system.
-    D3DXMatrixPerspectiveFovLH(&mProjectionMatrix,PI * 0.25f,
+    D3DXMatrixPerspectiveFovLH(&mProjectionMatrix,
+        boost::math::float_constants::pi * 0.25f,
         static_cast<float>(width) / static_cast<float>(height),0.1f,1000.0f);
 
     //Initialize the world matrix to the identity matrix.
@@ -603,6 +604,10 @@ void DX11Renderer::Render()
         //Switch the front buffer with the back buffer.
         mpSwapChain->Present(1,0);
     }
+
+////////////////////////////////////////////////////////////////////////////////
+
+    Renderer::Render();
 }
 
 /*virtual*/

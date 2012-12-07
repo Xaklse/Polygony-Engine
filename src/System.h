@@ -27,6 +27,10 @@ public:
     static System* Get();
 
     void CommandLine(const string& commandLine) { mCommandLine = commandLine; }
+    float ElapsedTime() const
+        { return static_cast<float>(mStopWatch.elapsed()) /
+          static_cast<float>(mStopWatch.resolution()); }
+    void ThreadSleep(float seconds);
 
     int ErrorCode() const { return mErrorCode; }
     void ErrorCode(int errorCode) { mErrorCode = errorCode; }
@@ -37,9 +41,15 @@ protected:
     virtual void Initialize() = 0;
     virtual void Shutdown() = 0;
 
+    virtual void ThreadDynamicSleep();
+
     bool mCleanedUp;
     string mCommandLine;
     int mErrorCode;
+
+    float mDesiredFramerate;
+    float mDynamicSleepSecs;
+    float mOldElapsedTime;
 
     std::unique_ptr<Input> mpInput;
     std::unique_ptr<Renderer> mpRenderer;
