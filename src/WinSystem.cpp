@@ -25,18 +25,32 @@
 int WINAPI WinMain(HINSTANCE instanceHandle,HINSTANCE hPrevInstance,
     LPSTR lpCommandLine,int nShowCommand)
 {
-    Poly::System* pSystem = new Poly::WinSystem();
+#ifdef _DEBUG
+    //Retrieve the state of the debug flag to control the allocation behavior of
+    //the debug heap manager.
+    int debugFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+
+    //Perform memory check for each allocaction/deallocation request.
+    debugFlag |= _CRTDBG_CHECK_ALWAYS_DF;
+
+    //Perform automatic leak checking at program exit.
+    debugFlag |= _CRTDBG_LEAK_CHECK_DF;
+
+    _CrtSetDbgFlag(debugFlag);
+#endif
+
+    std::unique_ptr<Poly::System> pSystem(NEW Poly::WinSystem());
 
     pSystem->CommandLine(static_cast<string>(lpCommandLine));
 
-    Poco::Thread* pThread = new Poco::Thread();
+    std::unique_ptr<Poco::Thread> pThread(NEW Poco::Thread());
     pThread->start(*pSystem);
     pThread->join();
 
     int result = pSystem->ErrorCode();
 
-    delete pSystem;
-    delete pThread;
+    pSystem.reset(nullptr);
+    pThread.reset(nullptr);
 
     return result;
 }
@@ -123,17 +137,17 @@ void WinSystem::Initialize()
 
         //Create a POCO channel assigned to the Windows console.
         Poco::AutoPtr<Poco::WindowsConsoleChannel> pConsoleChannel(
-            new Poco::WindowsConsoleChannel());
+            NEW Poco::WindowsConsoleChannel());
 
         //Create a POCO channel assigned to a logging file.
-        Poco::AutoPtr<Poco::FileChannel> pFileChannel(new Poco::FileChannel());
+        Poco::AutoPtr<Poco::FileChannel> pFileChannel(NEW Poco::FileChannel());
         pFileChannel->setProperty("path",LOG_FILE);
         pFileChannel->setProperty("rotation","10 M");
 
         //Create a POCO channel that sends a message to the console channel and
         //the logging file simultaneously.
         Poco::AutoPtr<Poco::SplitterChannel> pSplitterChannel(
-            new Poco::SplitterChannel());
+            NEW Poco::SplitterChannel());
         pSplitterChannel->addChannel(pConsoleChannel);
         pSplitterChannel->addChannel(pFileChannel);
 
@@ -157,7 +171,7 @@ void WinSystem::Initialize()
         LOG("Loading configurable options...");
 
         //Load the system settings from the main configuration file.
-        mpConfigurationFile = new Poco::Util::IniFileConfiguration(INI_FILE);
+        mpConfigurationFile = NEW Poco::Util::IniFileConfiguration(INI_FILE);
 
         mDesiredFramerate = static_cast<float>(mpConfigurationFile->getInt(
             "System.DesiredFramerate",60));
@@ -231,8 +245,8 @@ void WinSystem::Initialize()
         SetForegroundWindow(mWindowHandle);
         SetFocus(mWindowHandle);
 
-        mpInput.reset(new Input());
-        mpRenderer.reset(new DX11Renderer());
+        mpInput.reset(NEW Input());
+        mpRenderer.reset(NEW DX11Renderer());
 
         mpRenderer->Initialize(width,height,fullScreen);
 
@@ -254,29 +268,6 @@ void WinSystem::Initialize()
 
         ErrorCode(-1);
     }
-}
-
-/*virtual*/
-void WinSystem::Shutdown()
-{
-    LOG("Shutting down Polygony Engine...");
-
-    if (mpRenderer.get() != nullptr)
-    {
-        mpRenderer.reset(nullptr);
-    }
-
-    if (mpInput != nullptr)
-    {
-        mpInput.reset(nullptr);
-    }
-
-    CleanUp();
-
-    mCleanedUp = true;
-
-    //Stop the measured time.
-    mStopWatch.stop();
 }
 
 /*virtual*/
@@ -322,6 +313,29 @@ void WinSystem::Run()
     }
 
     Shutdown();
+}
+
+/*virtual*/
+void WinSystem::Shutdown()
+{
+    LOG("Shutting down Polygony Engine...");
+
+    if (mpRenderer.get() != nullptr)
+    {
+        mpRenderer.reset(nullptr);
+    }
+
+    if (mpInput != nullptr)
+    {
+        mpInput.reset(nullptr);
+    }
+
+    CleanUp();
+
+    mCleanedUp = true;
+
+    //Stop the measured time.
+    mStopWatch.stop();
 }
 
 /*virtual*/

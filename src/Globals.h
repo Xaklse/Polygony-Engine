@@ -64,10 +64,20 @@ typedef Vectormath::Aos::Vector3 Vector3;
 typedef Vectormath::Aos::Vector4 Vector4;
 
 
-#define VMATH Vectormath::Aos
+const string INI_FILE = "config.ini";
+const string LOG_FILE = "log.log";
 
-#define INI_FILE "config.ini"
-#define LOG_FILE "log.log"
+
+#ifdef _DEBUG
+    #include <crtdbg.h>
+
+    #define NEW new(_NORMAL_BLOCK,__FILE__,__LINE__)
+#else
+    #define NEW new
+#endif
+
+
+#define VMATH Vectormath::Aos
 
 #define LOG(x) Poly::System::Log(x)
 #define TO_STRING(x) boost::lexical_cast<string>(x)

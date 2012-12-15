@@ -34,85 +34,33 @@ DX11Renderer::~DX11Renderer()
 {
     LOG("Shutting down DirectX 11 renderer...");
 
-    if (mpInputLayout != nullptr)
-    {
-        mpInputLayout->Release();
-        mpInputLayout = nullptr;
-    }
-
-    if (mpPixelShader != nullptr)
-    {
-        mpPixelShader->Release();
-        mpPixelShader = nullptr;
-    }
-
-    if (mpVertexShader != nullptr)
-    {
-        mpVertexShader->Release();
-        mpVertexShader = nullptr;
-    }
-
-    if (mpIndexBuffer != nullptr)
-    {
-        mpIndexBuffer->Release();
-        mpIndexBuffer = nullptr;
-    }
-
-    if (mpVertexBuffer != nullptr)
-    {
-        mpVertexBuffer->Release();
-        mpVertexBuffer = nullptr;
-    }
-
     if (mpSwapChain != nullptr)
     {
         //Switch to windowed mode.
         mpSwapChain->SetFullscreenState(false,nullptr);
-
-        mpSwapChain->Release();
-        mpSwapChain = nullptr;
     }
 
-    if (mpRasterizerState != nullptr)
-    {
-        mpRasterizerState->Release();
-        mpRasterizerState = nullptr;
-    }
+    ComRelease(mpInputLayout);
+    ComRelease(mpPixelShader);
+    ComRelease(mpVertexShader);
+    ComRelease(mpIndexBuffer);
+    ComRelease(mpVertexBuffer);
+    ComRelease(mpSwapChain);
+    ComRelease(mpRasterizerState);
+    ComRelease(mpDepthStencilView);
+    ComRelease(mpDepthStencilState);
+    ComRelease(mpDepthBufferTexture);
+    ComRelease(mpBackBufferRenderTarget);
+    ComRelease(mpDeviceContext);
+    ComRelease(mpDevice);
+}
 
-    if (mpDepthStencilView != nullptr)
+void DX11Renderer::ComRelease(IUnknown* pComInterface)
+{
+    if (pComInterface != nullptr)
     {
-        mpDepthStencilView->Release();
-        mpDepthStencilView = nullptr;
-    }
-
-    if (mpDepthStencilState != nullptr)
-    {
-        mpDepthStencilState->Release();
-        mpDepthStencilState = nullptr;
-    }
-
-    if (mpDepthBufferTexture != nullptr)
-    {
-        mpDepthBufferTexture->Release();
-        mpDepthBufferTexture = nullptr;
-    }
-
-    if (mpBackBufferRenderTarget != nullptr)
-    {
-        mpBackBufferRenderTarget->Release();
-        mpBackBufferRenderTarget = nullptr;
-    }
-
-    if (mpDeviceContext != nullptr)
-    {
-        mpDeviceContext->Release();
-        mpDeviceContext = nullptr;
-    }
-
-    if (mpDevice != nullptr)
-    {
-        mpDevice->Release();
-        mpDevice = nullptr;
+        pComInterface->Release();
+        pComInterface = nullptr;
     }
 }
 

@@ -36,7 +36,9 @@ public:
     virtual void Render();
     virtual bool WindowResize();
 
-private:
+protected:
+    void ComRelease(IUnknown* pComInterface);
+
     struct Vertex
     {
         float Position[3];
