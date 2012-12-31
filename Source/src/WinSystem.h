@@ -28,20 +28,20 @@ public:
     WinSystem();
     virtual ~WinSystem();
 
-    virtual void Exit();
-    virtual void Run();
+    void Exit();
+    void Run();
 
-    virtual bool WindowEvent(HWND windowHandle,UINT intMessage,
-        WPARAM firstParam,LPARAM secondParam);
+    bool WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
+        LPARAM secondParam);
 
     Poco::Util::IniFileConfiguration* ConfigurationFile()
         { return mpConfigurationFile.get(); };
     HWND WindowHandle() const { return mWindowHandle; };
 
-protected:
-    virtual void CleanUp();
-    virtual void Initialize();
-    virtual void Shutdown();
+private:
+    void CleanUp();
+    void Initialize();
+    void Shutdown();
 
     /*Pointer to the main configuration file.*/
     Poco::AutoPtr<Poco::Util::IniFileConfiguration> mpConfigurationFile;

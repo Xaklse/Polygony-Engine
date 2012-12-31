@@ -22,7 +22,7 @@
             \:\__\        /:/  /      \::/  /     \/__/        /:/  /      \:\__\               
              \/__/        \/__/        \/__/                   \/__/        \/__/               
 
-Polygony Engine, since 25th Jun 2011
+Polygony Engine
 by Javier "Xaklse" Osset
 
 

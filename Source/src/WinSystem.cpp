@@ -94,7 +94,6 @@ WinSystem::~WinSystem()
         CleanUp();
 }
 
-/*virtual*/
 void WinSystem::CleanUp()
 {
     if (mWindowHandle != nullptr)
@@ -115,13 +114,11 @@ void WinSystem::CleanUp()
     }
 }
 
-/*virtual*/
 void WinSystem::Exit()
 {
     DestroyWindow(mWindowHandle);
 }
 
-/*virtual*/
 void WinSystem::Initialize()
 {
     try
@@ -270,7 +267,6 @@ void WinSystem::Initialize()
     }
 }
 
-/*virtual*/
 void WinSystem::Run()
 {
     Initialize();
@@ -315,7 +311,6 @@ void WinSystem::Run()
     Shutdown();
 }
 
-/*virtual*/
 void WinSystem::Shutdown()
 {
     LOG("Shutting down Polygony Engine...");
@@ -338,7 +333,6 @@ void WinSystem::Shutdown()
     mStopWatch.stop();
 }
 
-/*virtual*/
 bool WinSystem::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
     LPARAM secondParam)
 {
