@@ -18,14 +18,16 @@ public:
 
     virtual void Initialize(uint width,uint height,bool fullScreen) = 0;
 
+    virtual bool FrameResize() = 0;
     virtual void Render() = 0;
-    virtual bool WindowResize() = 0;
 
 protected:
     float mFps;
     int mFpsIterations;
     float mFpsLastTimestamp;
     bool mFpsLogging;
+
+    bool mVerticalSync;
 };
 
 

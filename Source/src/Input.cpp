@@ -2,7 +2,7 @@
 #include "Input.h"
 
 
-#include "System.h"
+#include "Application.h"
 
 
 namespace Poly
@@ -22,7 +22,7 @@ bool Input::KeyPressEvent(uint key)
     if (key == 27)
     {
         //Esc key.
-        Poly::System::Get()->Exit();
+        Poly::Application::Get()->Exit();
     }
 
     return true;

@@ -1,5 +1,5 @@
 
-#include "WinSystem.h"
+#include "WinApplication.h"
 
 
 #include "Poco/DateTimeFormat.h"
@@ -39,17 +39,17 @@ int WINAPI WinMain(HINSTANCE instanceHandle,HINSTANCE hPrevInstance,
     _CrtSetDbgFlag(debugFlag);
 #endif
 
-    std::unique_ptr<Poly::System> pSystem(NEW Poly::WinSystem());
+    std::unique_ptr<Poly::Application> pApplication(NEW Poly::WinApplication());
 
-    pSystem->CommandLine(static_cast<string>(lpCommandLine));
+    pApplication->CommandLine(static_cast<string>(lpCommandLine));
 
     std::unique_ptr<Poco::Thread> pThread(NEW Poco::Thread());
-    pThread->start(*pSystem);
+    pThread->start(*pApplication);
     pThread->join();
 
-    int result = pSystem->ErrorCode();
+    int result = pApplication->ErrorCode();
 
-    pSystem.reset(nullptr);
+    pApplication.reset(nullptr);
     pThread.reset(nullptr);
 
     return result;
@@ -66,8 +66,8 @@ int WINAPI WinMain(HINSTANCE instanceHandle,HINSTANCE hPrevInstance,
 LRESULT CALLBACK WndProc(HWND windowHandle,UINT intMessage,WPARAM firstParam,
     LPARAM secondParam)
 {
-    if (!static_cast<Poly::WinSystem*>(Poly::System::Get())->WindowEvent(
-        windowHandle,intMessage,firstParam,secondParam))
+    if (!static_cast<Poly::WinApplication*>(Poly::Application::Get())->
+        WindowEvent(windowHandle,intMessage,firstParam,secondParam))
     {
         //Send the event to the default message handler.
         return DefWindowProc(windowHandle,intMessage,firstParam,secondParam);
@@ -81,20 +81,19 @@ namespace Poly
 {
 
 
-WinSystem::WinSystem() : System(),
-    mpConfigurationFile(nullptr),
+WinApplication::WinApplication() : Application(),
     mInstanceHandle(nullptr),
     mWindowHandle(nullptr)
 {
 }
 
-WinSystem::~WinSystem()
+WinApplication::~WinApplication()
 {
     if (!mCleanedUp)
         CleanUp();
 }
 
-void WinSystem::CleanUp()
+void WinApplication::CleanUp()
 {
     if (mWindowHandle != nullptr)
     {
@@ -107,34 +106,33 @@ void WinSystem::CleanUp()
         UnregisterClass(mWindowClassName,mInstanceHandle);
         mInstanceHandle = nullptr;
     }
-
-    if (mpConfigurationFile.get() != nullptr)
-    {
-        mpConfigurationFile = nullptr;
-    }
 }
 
-void WinSystem::Exit()
+void WinApplication::Exit()
 {
     DestroyWindow(mWindowHandle);
 }
 
-void WinSystem::Initialize()
+void WinApplication::Initialize()
 {
     try
     {
-        mInstanceHandle = GetModuleHandle(nullptr);
-        mWindowClassName = L"PolygonyEngine";
-
         //Start the time to measure it.
         mStopWatch.start();
 
+        mInstanceHandle = GetModuleHandle(nullptr);
+        mWindowClassName = L"PolygonyEngine";
+
+        bool consoleError = false;
+
+#ifdef _DEBUG
         //Allocate a Windows console if it doesn't exist.
-        bool result = AllocConsole() != 0;
+        consoleError = AllocConsole() == 0;
 
         //Create a POCO channel assigned to the Windows console.
         Poco::AutoPtr<Poco::WindowsConsoleChannel> pConsoleChannel(
             NEW Poco::WindowsConsoleChannel());
+#endif
 
         //Create a POCO channel assigned to a logging file.
         Poco::AutoPtr<Poco::FileChannel> pFileChannel(NEW Poco::FileChannel());
@@ -145,7 +143,9 @@ void WinSystem::Initialize()
         //the logging file simultaneously.
         Poco::AutoPtr<Poco::SplitterChannel> pSplitterChannel(
             NEW Poco::SplitterChannel());
+#ifdef _DEBUG
         pSplitterChannel->addChannel(pConsoleChannel);
+#endif
         pSplitterChannel->addChannel(pFileChannel);
 
         //Assign the new splitter channel to the logger object.
@@ -157,7 +157,7 @@ void WinSystem::Initialize()
 
         LOG("Initializing Polygony Engine...");
 
-        if (!result)
+        if (consoleError)
         {
             throw Exception("Console allocation failed." + DEBUG_INFO,
                 GetLastError());
@@ -168,21 +168,23 @@ void WinSystem::Initialize()
         LOG("Loading configurable options...");
 
         //Load the system settings from the main configuration file.
-        mpConfigurationFile = NEW Poco::Util::IniFileConfiguration(INI_FILE);
+        mpConfigurationFile = NEW Poco::Util::IniFileConfiguration(CONF_FILE);
 
         mDesiredFramerate = static_cast<float>(mpConfigurationFile->getInt(
-            "System.DesiredFramerate",60));
+            "Application.DesiredFramerate",60));
 
-        bool fullScreen = mpConfigurationFile->getBool("System.Fullscreen",
+        bool fullScreen = mpConfigurationFile->getBool("Application.Fullscreen",
             false);
-        uint fullscreenWidth = mpConfigurationFile->getInt("System.FullscreenX",
-            1280);
+        uint fullscreenWidth = mpConfigurationFile->getInt(
+            "Application.FullscreenX",1280);
         uint fullscreenHeight = mpConfigurationFile->getInt(
-            "System.FullscreenY",720);
-        uint windowWidth = mpConfigurationFile->getInt("System.WindowedX",800);
-        uint windowHeight = mpConfigurationFile->getInt("System.WindowedY",600);
+            "Application.FullscreenY",720);
+        uint windowWidth = mpConfigurationFile->getInt("Application.WindowedX",
+            800);
+        uint windowHeight = mpConfigurationFile->getInt("Application.WindowedY",
+            600);
         string windowTitle = mpConfigurationFile->getString(
-            "System.WindowTitle","Polygony Engine");
+            "Application.WindowTitle","Polygony Engine");
 
         uint width = fullScreen ? fullscreenWidth : windowWidth;
         uint height = fullScreen ? fullscreenHeight : windowHeight;
@@ -267,7 +269,7 @@ void WinSystem::Initialize()
     }
 }
 
-void WinSystem::Run()
+void WinApplication::Run()
 {
     Initialize();
 
@@ -283,19 +285,22 @@ void WinSystem::Run()
         //Loop until there is a quit message from the window or the user.
         while (loop)
         {
-            //Handle the Windows messages.
-            if (PeekMessage(&message,nullptr,0,0,PM_REMOVE))
+            //Handle all Windows-related messages.
+            while (PeekMessage(&message,nullptr,0,0,PM_REMOVE))
             {
                 TranslateMessage(&message);
                 DispatchMessage(&message);
+
+                //If Windows signals to end the application then exit out.
+                if (message.message == WM_QUIT)
+                {
+                    loop = false;
+
+                    break;
+                }
             }
 
-            //If Windows signals to end the application then exit out.
-            if (message.message == WM_QUIT)
-            {
-                loop = false;
-            }
-            else
+            if (loop)
             {
                 //Do the frame processing.
                 mpRenderer->Render();
@@ -311,7 +316,7 @@ void WinSystem::Run()
     Shutdown();
 }
 
-void WinSystem::Shutdown()
+void WinApplication::Shutdown()
 {
     LOG("Shutting down Polygony Engine...");
 
@@ -333,8 +338,8 @@ void WinSystem::Shutdown()
     mStopWatch.stop();
 }
 
-bool WinSystem::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
-    LPARAM secondParam)
+bool WinApplication::WindowEvent(HWND windowHandle,UINT intMessage,
+    WPARAM firstParam,LPARAM secondParam)
 {
     switch (intMessage)
     {
@@ -363,7 +368,7 @@ bool WinSystem::WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
         case WM_SIZE:
             if (mpRenderer != nullptr)
             {
-                return mpRenderer->WindowResize();
+                return mpRenderer->FrameResize();
             }
     }
 

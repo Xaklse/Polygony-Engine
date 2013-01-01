@@ -1,5 +1,5 @@
 
-#include "System.h"
+#include "Application.h"
 
 
 #include "Poco/DateTimeFormatter.h"
@@ -9,10 +9,10 @@ namespace Poly
 {
 
 
-static System* spSystem = nullptr;
+static Application* spApplication = nullptr;
 
 
-System::System() : Runnable(),
+Application::Application() : Runnable(),
     mCleanedUp(false),
     mErrorCode(0),
 
@@ -21,13 +21,20 @@ System::System() : Runnable(),
     mOldElapsedTime(0.0f),
 
     mpInput(nullptr),
-    mpRenderer(nullptr)
+    mpRenderer(nullptr),
+
+    mpConfigurationFile(nullptr)
 {
-    spSystem = this;
+    spApplication = this;
 }
 
-System::~System()
+Application::~Application()
 {
+    if (mpConfigurationFile.get() != nullptr)
+    {
+        mpConfigurationFile = nullptr;
+    }
+
     if (mpRenderer.get() != nullptr)
     {
         mpRenderer.reset(nullptr);
@@ -40,24 +47,24 @@ System::~System()
 
     Poco::Logger::root().information("");
 
-    spSystem = nullptr;
+    spApplication = nullptr;
 }
 
 /*static*/
-System* System::Get()
+Application* Application::Get()
 {
-    return spSystem;
+    return spApplication;
 };
 
 /*static*/
-void System::Log(const string& message)
+void Application::Log(const string& message)
 {
     Poco::Logger::root().information(Poco::cat(Poco::DateTimeFormatter::format(
         Poco::LocalDateTime(),"[%M:%S.%i] "),message));
 }
 
 /*virtual*/
-void System::Run()
+void Application::Run()
 {
     Initialize();
 
@@ -70,7 +77,7 @@ void System::Run()
 }
 
 /*virtual*/
-void System::ThreadDynamicSleep()
+void Application::ThreadDynamicSleep()
 {
     float elapsedTime = ElapsedTime();
 
@@ -92,7 +99,7 @@ void System::ThreadDynamicSleep()
     }
 }
 
-void System::ThreadSleep(float seconds)
+void Application::ThreadSleep(float seconds)
 {
     Poco::Thread::sleep(static_cast<long>(seconds * 1000.0f));
 }

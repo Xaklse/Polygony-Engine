@@ -6,7 +6,7 @@
 
 
 #include "Exception.h"
-#include "WinSystem.h"
+#include "WinApplication.h"
 
 
 namespace Poly
@@ -64,12 +64,16 @@ void DX11Renderer::ComRelease(IUnknown* pComInterface)
     }
 }
 
+bool DX11Renderer::FrameResize()
+{
+    return false;
+}
+
 void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
 {
     LOG("Initializing DirectX 11 renderer...");
 
-    mVerticalSync = static_cast<WinSystem*>(Poly::System::Get())->
-        ConfigurationFile()->getBool("Renderer.VerticalSync",false);
+    Renderer::Initialize(width,height,fullScreen);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -86,8 +90,8 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
         DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
     swapChainDescriptor.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     swapChainDescriptor.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-    swapChainDescriptor.OutputWindow = static_cast<Poly::WinSystem*>(
-        Poly::System::Get())->WindowHandle();
+    swapChainDescriptor.OutputWindow = static_cast<Poly::WinApplication*>(
+        Poly::Application::Get())->WindowHandle();
     swapChainDescriptor.SampleDesc.Count = 1;
     swapChainDescriptor.SampleDesc.Quality = 0;
     swapChainDescriptor.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
@@ -153,8 +157,8 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
 
     //Ignore full-screen transitions through the Alt+Enter key combination.
     result = pFactory->MakeWindowAssociation(
-        static_cast<Poly::WinSystem*>(Poly::System::Get())->WindowHandle(),
-        DXGI_MWA_NO_ALT_ENTER);
+        static_cast<Poly::WinApplication*>(Poly::Application::Get())->
+        WindowHandle(),DXGI_MWA_NO_ALT_ENTER);
 
     if (FAILED(result))
     {
@@ -554,11 +558,6 @@ void DX11Renderer::Render()
 ////////////////////////////////////////////////////////////////////////////////
 
     Renderer::Render();
-}
-
-bool DX11Renderer::WindowResize()
-{
-    return false;
 }
 
 

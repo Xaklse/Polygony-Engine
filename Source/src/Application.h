@@ -1,6 +1,6 @@
 
-#ifndef POLY_SYSTEM_H
-#define POLY_SYSTEM_H
+#ifndef POLY_APPLICATION_H
+#define POLY_APPLICATION_H
 
 
 #include "Globals.h"
@@ -12,11 +12,11 @@ namespace Poly
 {
 
 
-class System : public Poco::Runnable, private boost::noncopyable
+class Application : public Poco::Runnable, private boost::noncopyable
 {
 public:
-    System();
-    virtual ~System();
+    Application();
+    virtual ~Application();
 
     void run() { Run(); }
 
@@ -24,12 +24,15 @@ public:
     static void Log(const string& message);
     virtual void Run();
 
-    static System* Get();
+    static Application* Get();
 
-    void CommandLine(const string& commandLine) { mCommandLine = commandLine; }
+    Poco::Util::AbstractConfiguration* ConfigurationFile()
+        { return mpConfigurationFile.get(); }
     float ElapsedTime() const
         { return static_cast<float>(mStopWatch.elapsed()) /
           static_cast<float>(mStopWatch.resolution()); }
+
+    void CommandLine(const string& commandLine) { mCommandLine = commandLine; }
     void ThreadSleep(float seconds);
 
     int ErrorCode() const { return mErrorCode; }
@@ -54,6 +57,7 @@ protected:
     std::unique_ptr<Input> mpInput;
     std::unique_ptr<Renderer> mpRenderer;
 
+    Poco::AutoPtr<Poco::Util::AbstractConfiguration> mpConfigurationFile;
     Poco::Stopwatch mStopWatch;
 };
 
@@ -61,4 +65,4 @@ protected:
 }
 
 
-#endif //POLY_SYSTEM_H
+#endif //POLY_APPLICATION_H

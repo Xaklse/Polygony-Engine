@@ -33,8 +33,8 @@ public:
 
     void Initialize(uint width,uint height,bool fullScreen);
 
+    bool FrameResize();
     void Render();
-    bool WindowResize();
 
 private:
     void ComRelease(IUnknown* pComInterface);
@@ -44,8 +44,6 @@ private:
         float Position[3];
         float Color[4];
     };
-
-    bool mVerticalSync;
 
     /*The render target view which will store the back buffer pointer.*/
     ID3D11RenderTargetView* mpBackBufferRenderTarget;

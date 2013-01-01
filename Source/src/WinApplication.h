@@ -1,6 +1,6 @@
 
-#ifndef POLY_WINDOWS_SYSTEM_H
-#define POLY_WINDOWS_SYSTEM_H
+#ifndef POLY_WINDOWS_APPLICATION_H
+#define POLY_WINDOWS_APPLICATION_H
 
 
 #include "Globals.h"
@@ -11,22 +11,21 @@
 #include <windowsx.h>
 
 
-#include "Poco/AutoPtr.h"
 #include "Poco/Util/IniFileConfiguration.h"
 
 
-#include "System.h"
+#include "Application.h"
 
 
 namespace Poly
 {
 
 
-class WinSystem : public System
+class WinApplication : public Application
 {
 public:
-    WinSystem();
-    virtual ~WinSystem();
+    WinApplication();
+    virtual ~WinApplication();
 
     void Exit();
     void Run();
@@ -34,17 +33,12 @@ public:
     bool WindowEvent(HWND windowHandle,UINT intMessage,WPARAM firstParam,
         LPARAM secondParam);
 
-    Poco::Util::IniFileConfiguration* ConfigurationFile()
-        { return mpConfigurationFile.get(); };
     HWND WindowHandle() const { return mWindowHandle; };
 
 private:
     void CleanUp();
     void Initialize();
     void Shutdown();
-
-    /*Pointer to the main configuration file.*/
-    Poco::AutoPtr<Poco::Util::IniFileConfiguration> mpConfigurationFile;
 
     /*Handle to the application instance.*/
     HINSTANCE mInstanceHandle;
@@ -60,4 +54,4 @@ private:
 }
 
 
-#endif //POLY_WINDOWS_SYSTEM_H
+#endif //POLY_WINDOWS_APPLICATION_H

@@ -31,6 +31,7 @@
 #include "Boost/math/constants/constants.hpp"
 #include "Boost/utility.hpp"
 
+#include "Poco/AutoPtr.h"
 #include "Poco/Environment.h"
 #include "Poco/Logger.h"
 #include "Poco/Runnable.h"
@@ -38,6 +39,7 @@
 #include "Poco/String.h"
 #include "Poco/Thread.h"
 #include "Poco/Types.h"
+#include "Poco/Util/AbstractConfiguration.h"
 
 #include "vectormath/vmInclude.h" //An optional header file from Bullet Physics,
                                   //provides functions for 3D/4D vectors,
@@ -68,7 +70,7 @@ typedef Vectormath::Aos::Vector3 Vector3;
 typedef Vectormath::Aos::Vector4 Vector4;
 
 
-const string INI_FILE = "config.ini";
+const string CONF_FILE = "config.ini";
 const string LOG_FILE = "log.log";
 
 
@@ -81,7 +83,7 @@ const string LOG_FILE = "log.log";
 
 #define VMATH Vectormath::Aos
 
-#define LOG(x) Poly::System::Log(x)
+#define LOG(x) Poly::Application::Log(x)
 #define TO_STRING(x) boost::lexical_cast<string>(x)
 
 #define DEBUG_INFO TO_STRING(" File: " + TO_STRING(__FILE__).substr((TO_STRING(__FILE__).find_last_of("/\\")) + 1) + "; Line: " + TO_STRING(__LINE__) + ".")

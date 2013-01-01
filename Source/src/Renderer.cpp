@@ -2,7 +2,7 @@
 #include "Renderer.h"
 
 
-#include "System.h"
+#include "Application.h"
 
 
 namespace Poly
@@ -13,7 +13,9 @@ Renderer::Renderer() :
     mFps(0.0f),
     mFpsIterations(0),
     mFpsLastTimestamp(0.0f),
-    mFpsLogging(false)
+    mFpsLogging(false),
+
+    mVerticalSync(false)
 {
 }
 
@@ -22,11 +24,20 @@ Renderer::~Renderer()
 }
 
 /*virtual*/
+void Renderer::Initialize(uint width,uint height,bool fullScreen)
+{
+    mFpsLogging = Poly::Application::Get()->ConfigurationFile()->getBool(
+        "Renderer.LogFPS",false);
+    mVerticalSync = Poly::Application::Get()->ConfigurationFile()->getBool(
+        "Renderer.VerticalSync",false);
+}
+
+/*virtual*/
 void Renderer::Render()
 {
     mFpsIterations++;
 
-    float elapsedTime = Poly::System::Get()->ElapsedTime();
+    float elapsedTime = Poly::Application::Get()->ElapsedTime();
     float timeDifference = boost::algorithm::clamp(elapsedTime -
         mFpsLastTimestamp,0.0001f,1.0f);
 
