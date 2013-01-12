@@ -8,6 +8,12 @@
 #define VC_EXTRALEAN
 #define WINDOWS_LEAN_AND_MEAN
 
+//Enables macros mainly used for debugging and/or development.
+#ifdef _DEBUG
+    #define POLY_DEBUG_MEMORY
+    #define POLY_SHOW_CONSOLE
+#endif
+
 
 #include <algorithm> //Defines a collection of functions especially designed to
                      //be used on ranges of elements.
@@ -22,7 +28,7 @@
 #include <string> //Includes the string class of the Standard Template Library
                   //(STL).
 
-#ifdef _DEBUG
+#ifdef POLY_DEBUG_MEMORY
     #include <crtdbg.h> //Keeps track of memory allocation and deallocation.
 #endif
 
@@ -74,7 +80,7 @@ const string CONF_FILE = "config.ini";
 const string LOG_FILE = "log.log";
 
 
-#ifdef _DEBUG
+#ifdef POLY_DEBUG_MEMORY
     #define NEW new(_NORMAL_BLOCK,__FILE__,__LINE__)
 #else
     #define NEW new

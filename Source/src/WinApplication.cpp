@@ -25,7 +25,7 @@
 int WINAPI WinMain(HINSTANCE instanceHandle,HINSTANCE hPrevInstance,
     LPSTR lpCommandLine,int nShowCommand)
 {
-#ifdef _DEBUG
+#ifdef POLY_DEBUG_MEMORY
     //Retrieve the state of the debug flag to control the allocation behavior of
     //the debug heap manager.
     int debugFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
@@ -159,7 +159,7 @@ void WinApplication::Initialize()
         bool consoleError = false;
         mInstanceHandle = GetModuleHandle(nullptr);
 
-#ifdef _DEBUG
+#ifdef POLY_SHOW_CONSOLE
         //Allocate a Windows console if it doesn't exist.
         consoleError = AllocConsole() == 0;
 
@@ -177,7 +177,7 @@ void WinApplication::Initialize()
         //the logging file simultaneously.
         Poco::AutoPtr<Poco::SplitterChannel> pSplitterChannel(
             NEW Poco::SplitterChannel());
-#ifdef _DEBUG
+#ifdef POLY_SHOW_CONSOLE
         pSplitterChannel->addChannel(pConsoleChannel);
 #endif
         pSplitterChannel->addChannel(pFileChannel);
