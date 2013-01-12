@@ -110,8 +110,7 @@ void WinApplication::CleanUp()
         mInstanceHandle = nullptr;
     }
 
-    HANDLE handleMutex; 
-    handleMutex = OpenMutexW(MUTEX_ALL_ACCESS,false,mInstanceMutexName);
+    HANDLE handleMutex = OpenMutexW(MUTEX_ALL_ACCESS,false,mInstanceMutexName);
 
     if (handleMutex != nullptr) 
     {
@@ -138,9 +137,16 @@ void WinApplication::Initialize()
 
         if (GetLastError() == ERROR_ALREADY_EXISTS)
         {
-            MessageBox(nullptr,
-                L"Error; there is another instance of this program running.",
-                mWindowClassName,MB_OK | MB_ICONERROR);
+            //Find and show the window of the other application instance.
+            mWindowHandle = FindWindow(mWindowClassName,nullptr);
+
+            if (mWindowHandle != nullptr)
+            {
+                ShowWindow(mWindowHandle,SW_SHOWNORMAL);
+                SetFocus(mWindowHandle);
+                SetForegroundWindow(mWindowHandle);
+                SetActiveWindow(mWindowHandle);
+            }
 
             ErrorCode(ERROR_ALREADY_EXISTS);
 
