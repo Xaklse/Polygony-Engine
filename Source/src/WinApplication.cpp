@@ -41,14 +41,17 @@ int WINAPI WinMain(HINSTANCE instanceHandle,HINSTANCE hPrevInstance,
 
     std::unique_ptr<Poly::Application> pApplication(NEW Poly::WinApplication());
 
+    //Pass the command line to the application object.
     pApplication->CommandLine(static_cast<string>(lpCommandLine));
 
+    //Create a thread for the application object and wait for it to terminate.
     std::unique_ptr<Poco::Thread> pThread(NEW Poco::Thread());
     pThread->start(*pApplication);
     pThread->join();
 
     int result = pApplication->ErrorCode();
 
+    //Destroy objects manually.
     pApplication.reset(nullptr);
     pThread.reset(nullptr);
 
@@ -106,6 +109,15 @@ void WinApplication::CleanUp()
         UnregisterClass(mWindowClassName,mInstanceHandle);
         mInstanceHandle = nullptr;
     }
+
+    HANDLE handleMutex; 
+    handleMutex = OpenMutexW(MUTEX_ALL_ACCESS,false,mInstanceMutexName);
+
+    if (handleMutex != nullptr) 
+    {
+        ReleaseMutex(handleMutex);
+        CloseHandle(handleMutex);
+    }
 }
 
 void WinApplication::Exit()
@@ -117,13 +129,29 @@ void WinApplication::Initialize()
 {
     try
     {
+        mInstanceMutexName =
+            L"PolygonyEngine MUTEX: F3B08E7B-9656-4E5D-8332-333A1FDF3298";
+        mWindowClassName = L"PolygonyEngine";
+
+        //Avoid multiple instances of the application.
+        CreateMutexW(nullptr,true,mInstanceMutexName);
+
+        if (GetLastError() == ERROR_ALREADY_EXISTS)
+        {
+            MessageBox(nullptr,
+                L"Error; there is another instance of this program running.",
+                mWindowClassName,MB_OK | MB_ICONERROR);
+
+            ErrorCode(ERROR_ALREADY_EXISTS);
+
+            return;
+        }
+
         //Start the time to measure it.
         mStopWatch.start();
 
-        mInstanceHandle = GetModuleHandle(nullptr);
-        mWindowClassName = L"PolygonyEngine";
-
         bool consoleError = false;
+        mInstanceHandle = GetModuleHandle(nullptr);
 
 #ifdef _DEBUG
         //Allocate a Windows console if it doesn't exist.

@@ -13,7 +13,7 @@
                      //be used on ranges of elements.
 #include <iostream> //Provides input and output functionality using streams. A
                     //stream is an abstraction that represents a device on which
-                    //input and ouput operations are performed.
+                    //input and output operations are performed.
 #include <memory> //Provides general utilities to manage memory.
 #include <stdlib.h> //Includes several general purpose functions for dynamic
                     //memory management, random number generation,

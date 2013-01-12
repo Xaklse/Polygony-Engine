@@ -43,6 +43,9 @@ private:
     /*Handle to the application instance.*/
     HINSTANCE mInstanceHandle;
 
+    /*Mutex string name that ensures a single application instance.*/
+    LPCWSTR mInstanceMutexName;
+
     /*String which specifies the window class name.*/
     LPCWSTR mWindowClassName;
 
