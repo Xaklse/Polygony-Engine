@@ -11,6 +11,7 @@
 //Enables macros mainly used for debugging and/or development.
 #ifdef _DEBUG
     #define POLY_DEBUG_MEMORY
+    #define POLY_DEBUG_SHADERS
     #define POLY_SHOW_CONSOLE
 #endif
 
