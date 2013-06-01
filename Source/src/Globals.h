@@ -79,6 +79,8 @@ typedef Vectormath::Aos::Vector4 Vector4;
 const string CONF_FILE = "config.ini";
 const string LOG_FILE = "log.log";
 
+const float PI = boost::math::float_constants::pi;
+
 
 #ifdef POLY_DEBUG_MEMORY
     #define NEW new(_NORMAL_BLOCK,__FILE__,__LINE__)

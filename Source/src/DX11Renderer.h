@@ -4,6 +4,8 @@
 
 
 #include "Globals.h"
+#include "DX11PixelShader.h"
+#include "DX11VertexShader.h"
 
 
 //Header files which contain all the Direct3D functionality for setting up and
@@ -73,11 +75,11 @@ private:
     D3DXMATRIX mProjectionMatrix;
     D3DXMATRIX mWorldMatrix;
 
+    std::unique_ptr<DX11PixelShader> mpPixelShader;
+    std::unique_ptr<DX11VertexShader> mpVertexShader;
+
     ID3D11Buffer* mpIndexBuffer;
-    ID3D11InputLayout* mpInputLayout;
-    ID3D11PixelShader* mpPixelShader;
     ID3D11Buffer* mpVertexBuffer;
-    ID3D11VertexShader* mpVertexShader;
 };
 
 

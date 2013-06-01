@@ -110,12 +110,12 @@ void WinApplication::CleanUp()
         mInstanceHandle = nullptr;
     }
 
-    HANDLE handleMutex = OpenMutexW(MUTEX_ALL_ACCESS,false,mInstanceMutexName);
+    HANDLE mutexHandle = OpenMutexW(MUTEX_ALL_ACCESS,false,mInstanceMutexName);
 
-    if (handleMutex != nullptr) 
+    if (mutexHandle != nullptr) 
     {
-        ReleaseMutex(handleMutex);
-        CloseHandle(handleMutex);
+        ReleaseMutex(mutexHandle);
+        CloseHandle(mutexHandle);
     }
 }
 
@@ -137,14 +137,17 @@ void WinApplication::Initialize()
 
         if (GetLastError() == ERROR_ALREADY_EXISTS)
         {
-            //Find and show the window of the other application instance.
+            //Find the window of the other application instance.
             mWindowHandle = FindWindow(mWindowClassName,nullptr);
 
             if (mWindowHandle != nullptr)
             {
+                //Display the existing window on the screen.
                 ShowWindow(mWindowHandle,SW_SHOWNORMAL);
-                SetFocus(mWindowHandle);
+
+                //Bring the window up on the screen and set it as main focus.
                 SetForegroundWindow(mWindowHandle);
+                SetFocus(mWindowHandle);
                 SetActiveWindow(mWindowHandle);
             }
 
@@ -197,16 +200,17 @@ void WinApplication::Initialize()
                 GetLastError());
         }
 
+        //Log the operating system details.
         LOG(Poco::Environment::osName() + " " + Poco::Environment::osVersion());
 
         LOG("Loading configurable options...");
 
-        //Load the system settings from the main configuration file.
+        //Load the main configuration file.
         mpConfigurationFile = NEW Poco::Util::IniFileConfiguration(CONF_FILE);
 
+        //Get the stored system settings.
         mDesiredFramerate = static_cast<float>(mpConfigurationFile->getInt(
             "Application.DesiredFramerate",60));
-
         bool fullScreen = mpConfigurationFile->getBool("Application.Fullscreen",
             false);
         uint fullscreenWidth = mpConfigurationFile->getInt(
