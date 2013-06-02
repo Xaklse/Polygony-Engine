@@ -40,6 +40,12 @@
     <ClCompile Include="..\src\DX11PixelShader.cpp">
       <Filter>cpp</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Mesh.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DX11Mesh.cpp">
+      <Filter>cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Renderer.h">
@@ -73,6 +79,15 @@
       <Filter>h</Filter>
     </ClInclude>
     <ClInclude Include="..\src\DX11PixelShader.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Mesh.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DX11Mesh.h">
+      <Filter>h</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\DX11.h">
       <Filter>h</Filter>
     </ClInclude>
   </ItemGroup>

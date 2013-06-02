@@ -92,18 +92,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\DX11Mesh.cpp" />
     <ClCompile Include="..\src\DX11PixelShader.cpp" />
     <ClCompile Include="..\src\DX11Renderer.cpp" />
     <ClCompile Include="..\src\DX11SceneCamera.cpp" />
     <ClCompile Include="..\src\DX11VertexShader.cpp" />
     <ClCompile Include="..\src\Input.cpp" />
     <ClCompile Include="..\src\Exception.cpp" />
+    <ClCompile Include="..\src\Mesh.cpp" />
     <ClCompile Include="..\src\Renderer.cpp" />
     <ClCompile Include="..\src\Application.cpp" />
     <ClCompile Include="..\src\SceneCamera.cpp" />
     <ClCompile Include="..\src\WinApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\DX11.h" />
+    <ClInclude Include="..\src\DX11Mesh.h" />
     <ClInclude Include="..\src\DX11PixelShader.h" />
     <ClInclude Include="..\src\DX11Renderer.h" />
     <ClInclude Include="..\src\DX11SceneCamera.h" />
@@ -111,6 +115,7 @@
     <ClInclude Include="..\src\Globals.h" />
     <ClInclude Include="..\src\Exception.h" />
     <ClInclude Include="..\src\Input.h" />
+    <ClInclude Include="..\src\Mesh.h" />
     <ClInclude Include="..\src\Renderer.h" />
     <ClInclude Include="..\src\Application.h" />
     <ClInclude Include="..\src\SceneCamera.h" />
