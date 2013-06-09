@@ -78,6 +78,9 @@ void DX11PixelShader::Initialize(const string& shaderFileName,
         throw Exception("Direct3D 11 init failed (CreatePixelShader)." +
             DEBUG_INFO,result);
     }
+
+    //This object is no longer needed.
+    pPixelShaderBlob->Release();
 }
 
 void DX11PixelShader::Render(ID3D11DeviceContext* pDeviceContext)

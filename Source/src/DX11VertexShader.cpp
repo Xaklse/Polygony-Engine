@@ -14,6 +14,7 @@ namespace Poly
 
 DX11VertexShader::DX11VertexShader() :
     mpInputLayout(nullptr),
+    mpMatricesBuffer(nullptr),
     mpVertexShader(nullptr)
 {
 }
@@ -24,6 +25,12 @@ DX11VertexShader::~DX11VertexShader()
     {
         mpInputLayout->Release();
         mpInputLayout = nullptr;
+    }
+
+    if (mpMatricesBuffer != nullptr)
+    {
+        mpMatricesBuffer->Release();
+        mpMatricesBuffer = nullptr;
     }
 
     if (mpVertexShader != nullptr)
@@ -105,6 +112,34 @@ void DX11VertexShader::Initialize(const string& shaderFileName,
         throw Exception("Direct3D 11 init failed (CreateInputLayout)." +
             DEBUG_INFO,result);
     }
+
+    //This object is no longer needed.
+    pVertexShaderBlob->Release();
+
+////////////////////////////////////////////////////////////////////////////////
+
+    D3D11_BUFFER_DESC matricesBufferDescriptor;
+
+    //Initialize the description of the matrices constant buffer.
+    ZeroMemory(&matricesBufferDescriptor,sizeof(D3D11_BUFFER_DESC));
+
+    //Fill in the structure with the needed information.
+    matricesBufferDescriptor.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    matricesBufferDescriptor.ByteWidth = sizeof(MatricesBuffer);
+    matricesBufferDescriptor.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    matricesBufferDescriptor.MiscFlags = 0;
+    matricesBufferDescriptor.StructureByteStride = 0;
+    matricesBufferDescriptor.Usage = D3D11_USAGE_DYNAMIC;
+
+    //Create the shader-constant buffer.
+    result = pDevice->CreateBuffer(&matricesBufferDescriptor,nullptr,
+        &mpMatricesBuffer);
+
+    if (FAILED(result))
+    {
+        throw Exception("Direct3D 11 init failed (CreateMatricesBuffer)." +
+            DEBUG_INFO,result);
+    }
 }
 
 void DX11VertexShader::Render(ID3D11DeviceContext* pDeviceContext)
@@ -114,6 +149,9 @@ void DX11VertexShader::Render(ID3D11DeviceContext* pDeviceContext)
 
     //Bind the input-layout object to the input-assembler stage.
     pDeviceContext->IASetInputLayout(mpInputLayout);
+
+    //Update the shader-constant buffer in the vertex shader object.
+    pDeviceContext->VSSetConstantBuffers(0,1,&mpMatricesBuffer);
 }
 
 

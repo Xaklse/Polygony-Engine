@@ -171,7 +171,7 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
             DEBUG_INFO,result);
     }
 
-    //The pointers are no longer needed.
+    //These pointers are no longer needed.
     pFactory->Release();
     pAdapter->Release();
     pDeviceInterface->Release();
@@ -199,7 +199,7 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
             DEBUG_INFO,result);
     }
 
-    //The pointer to the back buffer is no longer needed.
+    //This pointer is no longer needed.
     pTexture->Release();
 
 ////////////////////////////////////////////////////////////////////////////////
