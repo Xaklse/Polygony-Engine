@@ -4,10 +4,11 @@
 
 
 #include "Globals.h"
+#include "SceneCamera.h"
 #include "DX11.h"
-#include "DX11Mesh.h"
 #include "DX11PixelShader.h"
 #include "DX11VertexShader.h"
+#include "DX11Mesh.h"
 #include "Renderer.h"
 
 
@@ -53,9 +54,7 @@ private:
     /*Chain of buffers which swap positions each time a frame is rendered.*/
     IDXGISwapChain* mpSwapChain;
 
-    D3DXMATRIX mOrthoMatrix;
-    D3DXMATRIX mProjectionMatrix;
-    D3DXMATRIX mWorldMatrix;
+    std::unique_ptr<SceneCamera> mpCamera;
 
     std::unique_ptr<DX11Mesh> mpMesh;
 

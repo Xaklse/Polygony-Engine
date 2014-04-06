@@ -22,6 +22,7 @@ public:
     void Render(ID3D11DeviceContext* pDeviceContext);
 
 private:
+    /*The real pixel shader object.*/
     ID3D11PixelShader* mpPixelShader;
 };
 

@@ -35,10 +35,10 @@ void DX11Mesh::Initialize(ID3D11Device* pDevice)
     //Create a square using the vertex structure.
     Vertex vertices[] =
     {
-        {{-0.5f,-0.5f,0.5f},{1.0f,0.0f,0.0f,1.0f}},
-        {{-0.5f,0.5f,0.5f},{0.0f,1.0f,0.0f,1.0f}},
-        {{0.5f,0.5f,0.5f},{0.0f,0.0f,1.0f,1.0f}},
-        {{0.5f,-0.5f,0.5f},{1.0f,1.0f,1.0f,1.0f}}
+        {{15.0f,-5.0f,-5.0f},{1.0f,0.0f,0.0f,1.0f}},
+        {{15.0f,-5.0f,5.0f},{0.0f,1.0f,0.0f,1.0f}},
+        {{15.0f,5.0f,5.0f},{0.0f,0.0f,1.0f,1.0f}},
+        {{15.0f,5.0f,-5.0f},{1.0f,1.0f,1.0f,1.0f}}
     };
 
     //Define each triangle of the vertex structure.
@@ -125,7 +125,7 @@ void DX11Mesh::Render(ID3D11DeviceContext* pDeviceContext)
         D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     //Draw the index buffer to the back buffer.
-    pDeviceContext->DrawIndexed(6,0,0);
+    pDeviceContext->DrawIndexed(mNumIndices,0,0);
 }
 
 

@@ -142,13 +142,37 @@ void DX11VertexShader::Initialize(const string& shaderFileName,
     }
 }
 
-void DX11VertexShader::Render(ID3D11DeviceContext* pDeviceContext)
+void DX11VertexShader::Render(ID3D11DeviceContext* pDeviceContext,
+    const Matrix4& worldMatrix,const Matrix4& viewMatrix,
+    const Matrix4& projectionMatrix)
 {
     //Set the vertex shader object as active and ready for the device.
     pDeviceContext->VSSetShader(mpVertexShader,nullptr,0);
 
     //Bind the input-layout object to the input-assembler stage.
     pDeviceContext->IASetInputLayout(mpInputLayout);
+
+////////////////////////////////////////////////////////////////////////////////
+
+    D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+
+    //Lock the shader-constant buffer.
+    pDeviceContext->Map(mpMatricesBuffer,0,D3D11_MAP_WRITE_DISCARD,0,
+        &mappedSubresource);
+
+    //Get a pointer to the data contained in the shader-constant buffer.
+    MatricesBuffer* pMatricesData = (MatricesBuffer*)mappedSubresource.pData;
+
+    //Copy the matrices into the shader-constant buffer.
+    for (int i = 0; i < projectionMatrix.size(); i++)
+    {
+        pMatricesData->Projection[i] = *(projectionMatrix.data() + i);
+        pMatricesData->View[i] = *(viewMatrix.data() + i);
+        pMatricesData->World[i] = *(worldMatrix.data() + i);
+    }
+
+    //Unlock the shader-constant buffer.
+    pDeviceContext->Unmap(mpMatricesBuffer,0);
 
     //Update the shader-constant buffer in the vertex shader object.
     pDeviceContext->VSSetConstantBuffers(0,1,&mpMatricesBuffer);

@@ -50,6 +50,11 @@ DX11Renderer::~DX11Renderer()
         mpMesh.reset(nullptr);
     }
 
+    if (mpCamera.get() != nullptr)
+    {
+        mpCamera.reset(nullptr);
+    }
+
     ComRelease(mpSwapChain);
     ComRelease(mpRasterizerState);
     ComRelease(mpDepthStencilView);
@@ -348,18 +353,23 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    //Create the projection matrix for 3D rendering; uses a left-handed
-    //coordinate system.
-    D3DXMatrixPerspectiveFovLH(&mProjectionMatrix,PI * 0.25f,
-        static_cast<float>(width) / static_cast<float>(height),0.1f,1000.0f);
-
-    //Initialize the world matrix to the identity matrix.
-    D3DXMatrixIdentity(&mWorldMatrix);
-
     //Create an orthographic projection matrix for 2D rendering; uses a
     //left-handed coordinate system.
-    D3DXMatrixOrthoLH(&mOrthoMatrix,static_cast<float>(width),
+    CalculateOrthographicMatrix(static_cast<float>(width),
         static_cast<float>(height),0.1f,1000.0f);
+
+    //Create the perspective projection matrix based on a field of view for 3D
+    //rendering; uses a left-handed coordinate system.
+    CalculatePerspectiveMatrix(static_cast<float>(width),
+        static_cast<float>(height),0.1f,1000.0f,PI * 0.25f);
+
+    //Initialize the world-space matrix to the identity matrix.
+    mWorldMatrix << Matrix4::Identity();
+
+////////////////////////////////////////////////////////////////////////////////
+
+    //Create the main scene camera.
+    mpCamera.reset(NEW SceneCamera());
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -380,9 +390,11 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
 
 void DX11Renderer::Render()
 {
-    //Clear the back buffer to plain black color.
-    mpDeviceContext->ClearRenderTargetView(mpBackBufferRenderTarget,
-        D3DXCOLOR(0.0f,0.0f,0.0f,1.0f));
+    //Background color (solid black).
+    float clearColor[4] = {0.0f,0.0f,0.0f,1.0f};
+
+    //Clear the back buffer to previous color.
+    mpDeviceContext->ClearRenderTargetView(mpBackBufferRenderTarget,clearColor);
 
     //Clear the depth buffer.
     mpDeviceContext->ClearDepthStencilView(mpDepthStencilView,D3D11_CLEAR_DEPTH,
@@ -390,9 +402,10 @@ void DX11Renderer::Render()
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    //Set up the shaders.
+    //Generate the view matrix and set up the shaders.
+    mpVertexShader->Render(mpDeviceContext,mWorldMatrix,mpCamera->Render(),
+        mPerspectiveMatrix);
     mpPixelShader->Render(mpDeviceContext);
-    mpVertexShader->Render(mpDeviceContext);
 
 ////////////////////////////////////////////////////////////////////////////////
 

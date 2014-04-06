@@ -40,7 +40,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <SourcePath>..\src;$(SourcePath)</SourcePath>
-    <IncludePath>..\3rdp\Boost;..\3rdp\Poco\Util\include;..\3rdp\Poco\Foundation\include;..\3rdp\Bullet\src;$(IncludePath)</IncludePath>
+    <IncludePath>..\3rdp\Boost;..\3rdp\Poco\Util\include;..\3rdp\Poco\Foundation\include;..\3rdp\Eigen;..\3rdp\Bullet\src;$(IncludePath)</IncludePath>
     <LibraryPath>..\3rdp\Poco\lib;..\3rdp\Bullet\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\..\Test\</OutDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
@@ -49,7 +49,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <SourcePath>..\src;$(SourcePath)</SourcePath>
-    <IncludePath>..\3rdp\Boost;..\3rdp\Poco\Util\include;..\3rdp\Poco\Foundation\include;..\3rdp\Bullet\src;$(IncludePath)</IncludePath>
+    <IncludePath>..\3rdp\Boost;..\3rdp\Poco\Util\include;..\3rdp\Poco\Foundation\include;..\3rdp\Eigen;..\3rdp\Bullet\src;$(IncludePath)</IncludePath>
     <LibraryPath>..\3rdp\Poco\lib;$(LibraryPath)</LibraryPath>
     <OutDir>$(SolutionDir)..\..\Game\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
@@ -95,7 +95,6 @@
     <ClCompile Include="..\src\DX11Mesh.cpp" />
     <ClCompile Include="..\src\DX11PixelShader.cpp" />
     <ClCompile Include="..\src\DX11Renderer.cpp" />
-    <ClCompile Include="..\src\DX11SceneCamera.cpp" />
     <ClCompile Include="..\src\DX11VertexShader.cpp" />
     <ClCompile Include="..\src\Input.cpp" />
     <ClCompile Include="..\src\Exception.cpp" />
@@ -110,7 +109,6 @@
     <ClInclude Include="..\src\DX11Mesh.h" />
     <ClInclude Include="..\src\DX11PixelShader.h" />
     <ClInclude Include="..\src\DX11Renderer.h" />
-    <ClInclude Include="..\src\DX11SceneCamera.h" />
     <ClInclude Include="..\src\DX11VertexShader.h" />
     <ClInclude Include="..\src\Globals.h" />
     <ClInclude Include="..\src\Exception.h" />

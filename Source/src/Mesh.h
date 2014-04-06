@@ -15,6 +15,13 @@ class Mesh : private boost::noncopyable
 public:
     Mesh();
     virtual ~Mesh();
+
+protected:
+    struct Vertex
+    {
+        std::array<float,3> Position;
+        std::array<float,4> Color;
+    };
 };
 
 

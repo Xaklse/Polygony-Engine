@@ -4,9 +4,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 cbuffer MatricesBuffer
 {
-    matrix worldMatrix;
-    matrix viewMatrix;
-    matrix projectionMatrix;
+    //Data is stored in row-major order.
+    float4x4 projectionMatrix;
+    float4x4 viewMatrix;
+    float4x4 worldMatrix;
 };
 
 
@@ -36,7 +37,11 @@ OutputData Main(InputData input)
     //Set W component of vector to 1 for proper matrix calculations.
     input.position.w = 1.0f;
 
-    output.position = input.position;
+    //Apply vertex transformations.
+    output.position = mul(worldMatrix,input.position);
+    output.position = mul(viewMatrix,output.position);
+    output.position = mul(projectionMatrix,output.position);
+
     output.color = input.color;
 
     return output;

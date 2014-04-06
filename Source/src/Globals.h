@@ -18,6 +18,8 @@
 
 #include <algorithm> //Defines a collection of functions especially designed to
                      //be used on ranges of elements.
+#include <array> //Includes the static array container of the Standard Template
+                 //Library (STL).
 #include <iostream> //Provides input and output functionality using streams. A
                     //stream is an abstraction that represents a device on which
                     //input and output operations are performed.
@@ -48,9 +50,8 @@
 #include "Poco/Types.h"
 #include "Poco/Util/AbstractConfiguration.h"
 
-#include "vectormath/vmInclude.h" //An optional header file from Bullet Physics,
-                                  //provides functions for 3D/4D vectors,
-                                  //3x3/4x4 matrices and quaternions.
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 
 
 typedef unsigned int uint;
@@ -70,11 +71,15 @@ typedef double float64;
 
 typedef std::string string;
 
-typedef Vectormath::Aos::Matrix3 Matrix3;
-typedef Vectormath::Aos::Matrix4 Matrix4;
-typedef Vectormath::Aos::Quat Quat;
-typedef Vectormath::Aos::Vector3 Vector3;
-typedef Vectormath::Aos::Vector4 Vector4;
+typedef Eigen::Matrix<float,3,3,Eigen::RowMajor> Matrix3;
+typedef Eigen::Matrix<float,3,3,Eigen::RowMajor | Eigen::DontAlign> Matrix3DA;
+typedef Eigen::Matrix<float,4,4,Eigen::RowMajor> Matrix4;
+typedef Eigen::Matrix<float,4,4,Eigen::RowMajor | Eigen::DontAlign> Matrix4DA;
+typedef Eigen::Quaternion<float> Quat;
+typedef Eigen::Matrix<float,3,1> Vector3;
+typedef Eigen::Matrix<float,3,1,Eigen::DontAlign> Vector3DA;
+typedef Eigen::Matrix<float,4,1> Vector4;
+typedef Eigen::Matrix<float,4,1,Eigen::DontAlign> Vector4DA;
 
 
 const string CONF_FILE = "config.ini";

@@ -23,16 +23,13 @@ public:
     void Render(ID3D11DeviceContext* pDeviceContext);
 
 private:
-    struct Vertex
-    {
-        float Position[3];
-        float Color[4];
-    };
-
     uint mNumIndices;
     uint mNumVertices;
 
+    /*The buffer that stores index data.*/
     ID3D11Buffer* mpIndexBuffer;
+
+    /*The buffer that stores vertex data.*/
     ID3D11Buffer* mpVertexBuffer;
 };
 

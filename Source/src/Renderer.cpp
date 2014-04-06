@@ -55,5 +55,40 @@ void Renderer::Render()
     }
 }
 
+/*virtual*/
+void Renderer::CalculateOrthographicMatrix(float width,float height,
+    float nearPlane,float farPlane)
+{
+    //Create an orthographic projection matrix for 2D rendering; uses a
+    //left-handed coordinate system.
+    //    /  2/w   0      0     0  \
+    //    |   0   2/h     0     0  |
+    //    |   0    0   1/(f-n)  0  |
+    //    \   0    0   n/(n-f)  1  /
+    mOrthographicMatrix << 2.0f / width,                      0.0f,0.0f,0.0f,
+                           0.0f,2.0f / height,                     0.0f,0.0f,
+                           0.0f,0.0f,1.0f / (farPlane - nearPlane),     0.0f,
+                           0.0f,0.0f,nearPlane / (nearPlane - farPlane),1.0f;
+}
+
+/*virtual*/
+void Renderer::CalculatePerspectiveMatrix(float width,float height,
+    float nearPlane,float farPlane,float fovY)
+{
+    //Create the perspective projection matrix based on a field of view for 3D
+    //rendering; uses a left-handed coordinate system.
+    //    /  cot(f/2)*h/w     0            0        0  \
+    //    |        0       cot(f/2)        0        0  |
+    //    |        0          0       zf/(zf-zn)    1  |
+    //    \        0          0     -zn*zf/(zf-zn)  0  /
+    float cotangent = tan(PI * 0.5f - fovY * 0.5f);
+    float range = 1.0f / (farPlane - nearPlane);
+
+    mPerspectiveMatrix << cotangent * height / width,   0.0f,0.0f,0.0f,
+                          0.0f,cotangent,                    0.0f,0.0f,
+                          0.0f,0.0f,farPlane * range,             1.0f,
+                          0.0f,0.0f,-nearPlane * farPlane * range,0.0f;
+}
+
 
 }

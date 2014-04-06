@@ -33,6 +33,7 @@ Polygony Engine will be a game engine.
 Uses the following libraries placed in:
 ...\Polygony-Engine\Source\3rdp\Boost
 ...\Polygony-Engine\Source\3rdp\Bullet
+...\Polygony-Engine\Source\3rdp\Eigen
 ...\Polygony-Engine\Source\3rdp\Poco
 
 
