@@ -10,7 +10,7 @@ ehthumbs.db
 Thumbs.db
 *~
 
-#Ignore files build by Visual Studio.
+#Ignore files created by Visual Studio.
 *.obj
 *.exe
 *.pdb

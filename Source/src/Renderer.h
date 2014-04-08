@@ -32,6 +32,8 @@ protected:
     float mFpsLastTimestamp;
     bool mFpsLogging;
 
+    string mShadersPath;
+
     bool mVerticalSync;
 
     /*Matrix that defines the clipping planes (forming a box) used for the

@@ -8,6 +8,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="hlsl">
+      <UniqueIdentifier>{41a86131-e219-4217-a995-2bfba93e14ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\DX11Renderer.cpp">
@@ -84,5 +87,13 @@
     <ClInclude Include="..\src\DX11.h">
       <Filter>h</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\shdr\PixelShader.hlsl">
+      <Filter>hlsl</Filter>
+    </None>
+    <None Include="..\shdr\VertexShader.hlsl">
+      <Filter>hlsl</Filter>
+    </None>
   </ItemGroup>
 </Project>

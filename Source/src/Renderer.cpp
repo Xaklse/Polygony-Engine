@@ -26,10 +26,12 @@ Renderer::~Renderer()
 /*virtual*/
 void Renderer::Initialize(uint width,uint height,bool fullScreen)
 {
-    mFpsLogging = Poly::Application::Get()->ConfigurationFile()->getBool(
-        "Renderer.LogFPS",false);
-    mVerticalSync = Poly::Application::Get()->ConfigurationFile()->getBool(
-        "Renderer.VerticalSync",false);
+    Poco::Util::AbstractConfiguration* pConfigurationFile =
+        Poly::Application::Get()->ConfigurationFile();
+
+    mFpsLogging = pConfigurationFile->getBool("Renderer.LogFPS",false);
+    mShadersPath = pConfigurationFile->getString("Renderer.ShadersPath","");
+    mVerticalSync = pConfigurationFile->getBool("Renderer.VerticalSync",false);
 }
 
 /*virtual*/

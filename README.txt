@@ -27,7 +27,7 @@ by Javier "Xaklse" Osset
 
 
 
-Polygony Engine will be a game engine.
+Polygony Engine is a game engine created for educational purposes.
 
 
 Uses the following libraries placed in:

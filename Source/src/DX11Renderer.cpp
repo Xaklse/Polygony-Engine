@@ -384,8 +384,8 @@ void DX11Renderer::Initialize(uint width,uint height,bool fullScreen)
     mpPixelShader.reset(NEW DX11PixelShader());
     mpVertexShader.reset(NEW DX11VertexShader());
 
-    mpPixelShader->Initialize("pixelshader.hlsl",mpDevice);
-    mpVertexShader->Initialize("vertexshader.hlsl",mpDevice);
+    mpPixelShader->Initialize(mShadersPath + "PixelShader.hlsl",mpDevice);
+    mpVertexShader->Initialize(mShadersPath + "VertexShader.hlsl",mpDevice);
 }
 
 void DX11Renderer::Render()
