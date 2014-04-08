@@ -21,7 +21,6 @@ public:
     void run() { Run(); }
 
     virtual void Exit() = 0;
-    static void Log(const string& message);
     virtual void Run();
 
     static Application* Get();

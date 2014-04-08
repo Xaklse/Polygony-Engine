@@ -2,9 +2,6 @@
 #include "Application.h"
 
 
-#include "Poco/DateTimeFormatter.h"
-
-
 namespace Poly
 {
 
@@ -55,13 +52,6 @@ Application* Application::Get()
 {
     return spApplication;
 };
-
-/*static*/
-void Application::Log(const string& message)
-{
-    Poco::Logger::root().information(Poco::cat(Poco::DateTimeFormatter::format(
-        Poco::LocalDateTime(),"[%M:%S.%i] "),message));
-}
 
 /*virtual*/
 void Application::Run()

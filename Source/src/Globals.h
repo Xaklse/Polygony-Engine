@@ -41,6 +41,7 @@
 #include "Boost/utility.hpp"
 
 #include "Poco/AutoPtr.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/Environment.h"
 #include "Poco/Logger.h"
 #include "Poco/Runnable.h"
@@ -95,12 +96,24 @@ const float PI = boost::math::float_constants::pi;
 #endif
 
 
-#define VMATH Vectormath::Aos
-
-#define LOG(x) Poly::Application::Log(x)
+#define LOG(x) Poly::Log(x)
 #define TO_STRING(x) boost::lexical_cast<string>(x)
 
 #define DEBUG_INFO TO_STRING(" File: " + TO_STRING(__FILE__).substr((TO_STRING(__FILE__).find_last_of("/\\")) + 1) + "; Line: " + TO_STRING(__LINE__) + ".")
+
+
+namespace Poly
+{
+
+
+static void Log(const string& message)
+{
+    Poco::Logger::root().information(Poco::cat(Poco::DateTimeFormatter::format(
+        Poco::LocalDateTime(),"[%M:%S.%i] "),message));
+}
+
+
+}
 
 
 #endif //POLY_GLOBALS_H
